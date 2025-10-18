@@ -1,0 +1,38 @@
+{
+  "name": "finanzaspersonalesback",
+  "version": "1.0.0",
+  "description": "- Ismael Cordoba - Mariana Baradad - Juan Baranovsky - Francisco Rios - Hernan Folik",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "ts-node src/index.ts",
+    "build": "npx tsc --build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Bara1422/FinanzasPersonalesBack.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Bara1422/FinanzasPersonalesBack/issues"
+  },
+  "homepage": "https://github.com/Bara1422/FinanzasPersonalesBack#readme",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.2"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.2.6",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
+    "@types/node": "^24.8.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  }
+}
