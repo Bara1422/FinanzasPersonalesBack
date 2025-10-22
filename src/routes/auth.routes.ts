@@ -1,9 +1,11 @@
 import { Router } from "express";
 import { AuthController } from "../controllers/auth.controller";
 import { authMiddleware } from "../middlewares/auth.middleware";
+import { userRepository } from "../repositories";
+import { AuthService } from "../services/auth.service";
 
 const router = Router();
-const authController = AuthController.getInstance();
+const authController = new AuthController(new AuthService(userRepository));
 
 // Rutas de autenticación
 router.post("/register", authController.register);

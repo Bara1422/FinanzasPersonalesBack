@@ -2,39 +2,53 @@ import type { $Enums, Usuario } from "@prisma/client";
 import type { BcryptAdapter } from "../../config/bcrypt";
 import type { IUserRepository } from "../interfaces/IUserRepository";
 
-let usuariosDB: Usuario[] = [];
+// hashear una contraseña "1234" con bcrypt
+// para tener una contraseña válida en el mock
 
 export class UserRepositoryMock implements IUserRepository<Usuario> {
+  private usuariosDB: Usuario[] = [
+    {
+      id_usuario: 1,
+      name: "Admin",
+      email: "admin@example.com",
+      username: "admin",
+      password: this.hasher.hash("1234"),
+      rol: "ADMIN" as $Enums.Rol,
+      created_at: new Date(),
+      updated_at: new Date(),
+      activo: true,
+    },
+  ];
   constructor(private hasher: BcryptAdapter) {}
 
   async findByEmail(email: string): Promise<Usuario | null> {
-    const usuario = usuariosDB.find((user) => user.email === email);
+    const usuario = this.usuariosDB.find((user) => user.email === email);
     return Promise.resolve(usuario || null);
   }
   async findByUsername(username: string): Promise<Usuario | null> {
-    const usuario = usuariosDB.find((user) => user.username === username);
+    const usuario = this.usuariosDB.find((user) => user.username === username);
     return Promise.resolve(usuario || null);
   }
 
   async findAll(): Promise<Usuario[]> {
-    return Promise.resolve(usuariosDB);
+    return Promise.resolve(this.usuariosDB);
   }
 
   async findById(id: number): Promise<Usuario | null> {
-    const usuario = usuariosDB.find((user) => user.id_usuario === id);
+    const usuario = this.usuariosDB.find((user) => user.id_usuario === id);
     return Promise.resolve(usuario || null);
   }
 
   async update(id: number, data: Partial<Usuario>): Promise<Usuario | null> {
-    const index = usuariosDB.findIndex((user) => user.id_usuario === id);
+    const index = this.usuariosDB.findIndex((user) => user.id_usuario === id);
     if (index === -1) return Promise.resolve(null);
-    usuariosDB[index] = { ...usuariosDB[index], ...data };
-    return Promise.resolve(usuariosDB[index]);
+    this.usuariosDB[index] = { ...this.usuariosDB[index], ...data };
+    return Promise.resolve(this.usuariosDB[index]);
   }
 
   async delete(id: number): Promise<string> {
-    const filtered = usuariosDB.filter((user) => user.id_usuario !== id);
-    usuariosDB = filtered;
+    const filtered = this.usuariosDB.filter((user) => user.id_usuario !== id);
+    this.usuariosDB = filtered;
     return Promise.resolve("Usuario eliminado correctamente");
   }
 
@@ -43,7 +57,7 @@ export class UserRepositoryMock implements IUserRepository<Usuario> {
     const password_hash = data.password ? this.hasher.hash(data.password) : "";
 
     const newUsuario: Usuario = {
-      id_usuario: usuariosDB.length + 1,
+      id_usuario: this.usuariosDB.length + 1,
       name,
       email,
       username,
@@ -53,7 +67,7 @@ export class UserRepositoryMock implements IUserRepository<Usuario> {
       updated_at: data.updated_at || new Date(),
       activo: true,
     };
-    usuariosDB.push(newUsuario);
+    this.usuariosDB.push(newUsuario);
     return Promise.resolve(newUsuario);
   }
 
@@ -61,7 +75,7 @@ export class UserRepositoryMock implements IUserRepository<Usuario> {
     email: string,
     password: string,
   ): Promise<Usuario | null> {
-    const usuario = usuariosDB.find((user) => user.email === email);
+    const usuario = this.usuariosDB.find((user) => user.email === email);
     if (!usuario) return Promise.resolve(null);
 
     const isPasswordValid = this.hasher.compare(password, usuario.password);

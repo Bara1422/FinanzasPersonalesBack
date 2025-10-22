@@ -1,32 +1,19 @@
 import { BcryptAdapter } from "../config/bcrypt";
 
 export class RepositoryFactory {
-  private static instance: RepositoryFactory;
-  private hasher: BcryptAdapter;
+  static createAllRepositories() {
+    const useMock = process.env.NODE_ENV === "development";
+    const hasher = new BcryptAdapter();
 
-  private constructor() {
-    this.hasher = new BcryptAdapter();
-  }
-
-  static getInstance(): RepositoryFactory {
-    if (!RepositoryFactory.instance) {
-      RepositoryFactory.instance = new RepositoryFactory();
-    }
-    return RepositoryFactory.instance;
-  }
-
-  createAllRepositories() {
-    const isDevelopment = process.env.NODE_ENV === "development";
-
-    if (isDevelopment) {
+    if (useMock) {
       const { UserRepositoryMock } = require("./mock/UserRepositoryMock");
       return {
-        userRepository: new UserRepositoryMock(this.hasher),
+        userRepository: new UserRepositoryMock(hasher),
       };
     } else {
       const { UserRepositoryPrisma } = require("./prisma/UserRepositoryPrisma");
       return {
-        userRepository: new UserRepositoryPrisma(this.hasher),
+        userRepository: new UserRepositoryPrisma(hasher),
       };
     }
   }
