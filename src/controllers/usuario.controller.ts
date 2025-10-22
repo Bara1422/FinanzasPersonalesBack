@@ -1,20 +1,9 @@
 import type { Request, Response } from "express";
-import { UserService } from "../services/usuario.service";
+import type { UserService } from "../services/usuario.service";
 
 export class UserController {
-  private static instance: UserController;
-  private userService: UserService;
+  constructor(private userService: UserService) {}
 
-  private constructor() {
-    this.userService = new UserService();
-  }
-
-  static getInstance(): UserController {
-    if (!UserController.instance) {
-      UserController.instance = new UserController();
-    }
-    return UserController.instance;
-  }
   getAll = async (_req: Request, res: Response) => {
     try {
       const users = await this.userService.getAll();

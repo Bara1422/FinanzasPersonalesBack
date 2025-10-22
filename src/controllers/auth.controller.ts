@@ -1,20 +1,8 @@
 import type { Request, Response } from "express";
-import { AuthService } from "../services/auth.service";
+import type { AuthService } from "../services/auth.service";
 
 export class AuthController {
-  private static instance: AuthController;
-  private authService: AuthService;
-
-  private constructor() {
-    this.authService = new AuthService();
-  }
-
-  static getInstance(): AuthController {
-    if (!AuthController.instance) {
-      AuthController.instance = new AuthController();
-    }
-    return AuthController.instance;
-  }
+  constructor(private authService: AuthService) {}
 
   register = async (req: Request, res: Response) => {
     try {
