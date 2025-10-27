@@ -3,6 +3,8 @@ import express from "express";
 import { authMiddleware } from "./middlewares/auth.middleware";
 import authRoutes from "./routes/auth.routes";
 import userController from "./routes/usuario.router";
+import transaccionRoutes from "./routes/transaccion.router";
+
 
 const app = express();
 
@@ -13,6 +15,7 @@ app.use("/auth", authRoutes);
 
 app.use(authMiddleware);
 app.use("/usuarios", userController);
+app.use("/transacciones", transaccionRoutes);
 
 app.listen(PORT, () => {
   console.log(`Running on Port ${PORT}`);
