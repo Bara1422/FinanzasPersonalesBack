@@ -1,5 +1,6 @@
 import type { Usuario } from "@prisma/client";
 import jwt from "jsonwebtoken";
+import { toUsuarioDTO } from "../dtos/usuario.dto";
 import type { IUserRepository } from "../repositories/interfaces/IUserRepository";
 
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -22,40 +23,37 @@ export class AuthService {
     if (existingUsername)
       throw new Error("El nombre de usuario ya está en uso");
 
-    const usuarioCreado = await this.userRepository.create(data);
+    const createdUser = await this.userRepository.create(data);
 
     const token = jwt.sign(
       {
-        id_usuario: usuarioCreado.id_usuario,
-        email: usuarioCreado.email,
-        username: usuarioCreado.username,
-        rol: usuarioCreado.rol,
+        id_usuario: createdUser.id_usuario,
+        rol: createdUser.rol,
       },
       JWT_SECRET,
       { expiresIn: "24h" },
     );
-    return { usuario: usuarioCreado, token };
+    const userDTO = toUsuarioDTO(createdUser);
+    return { usuario: userDTO, token };
   }
 
   async login(email: string, password: string) {
-    const userValidado = await this.userRepository.validateCredentials(
+    const validatedUser = await this.userRepository.validateCredentials(
       email,
       password,
     );
-    if (!userValidado) throw new Error("Credenciales inválidas");
+    if (!validatedUser) throw new Error("Credenciales inválidas");
 
     const token = jwt.sign(
       {
-        id_usuario: userValidado.id_usuario,
-        email: userValidado.email,
-        username: userValidado.username,
-        rol: userValidado.rol,
+        id_usuario: validatedUser.id_usuario,
+        rol: validatedUser.rol,
       },
       JWT_SECRET,
       { expiresIn: "24h" },
     );
-
-    return { usuario: userValidado, token };
+    const userDTO = toUsuarioDTO(validatedUser);
+    return { usuario: userDTO, token };
   }
 
   async verifyToken(token: string) {
