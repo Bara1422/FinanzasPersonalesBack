@@ -9,7 +9,7 @@ const userController = new UserController(new UserService(userRepository));
 
 router.get("/", isAdmin, userController.getAll);
 router.get("/:id", userController.getById);
-router.put("/:id", userController.update);
+router.patch("/:id", userController.update);
 router.delete("/:id", userController.delete);
 
 export default router;
