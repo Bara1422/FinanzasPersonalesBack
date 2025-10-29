@@ -1,131 +1,163 @@
-import { Request, Response } from "express";
-import { TransaccionRepositoryPrisma } from "../repositories/prisma/TransaccionRepositoryPrisma";
+import type { Response } from "express";
+import type { AuthRequest } from "../middlewares/auth.middleware";
 
-const transaccionRepository = new TransaccionRepositoryPrisma();
+import type { TransaccionService } from "../services/transaccion.service";
 
 export class TransaccionController {
+  constructor(private transaccionService: TransaccionService) {}
+
   // Crea nueva transacción
-  static async crearTransaccion(req: Request, res: Response) {
+  crearTransaccion = async (req: AuthRequest, res: Response) => {
     try {
-      const user = (req as any).user;
-      if (!user || !user.id) {
+      const user = req.user;
+      if (!user || !user.id_usuario) {
         return res.status(401).json({ message: "Usuario no autenticado" });
       }
 
-      const data = { ...req.body, id_usuario: user.id };
-      const nuevaTransaccion = await transaccionRepository.create(data);
+      const data = { ...req.body, id_usuario: user.id_usuario };
+      const nuevaTransaccion = await this.transaccionService.crearTransaccion(
+        data,
+        user.id_usuario,
+      );
       return res.status(201).json(nuevaTransaccion);
-    } catch (error: any) {
-      console.error("Error al crear transacción:", error);
-      return res.status(500).json({
-        message: "Error al crear la transacción",
-        error: error.message,
+    } catch (error) {
+      res.status(500).json({
+        message: "Error al obtener usuario",
+        error: error.message || error,
       });
     }
-  }
+  };
+
+  // Obtiene todas las transacciones
+  obtenerTodasLasTransacciones = async (_req: AuthRequest, res: Response) => {
+    try {
+      const transacciones =
+        await this.transaccionService.obtenerTodasLasTransacciones();
+      return res.json(transacciones);
+    } catch (error) {
+      res.status(500).json({
+        message: "Error al obtener las transacciones",
+        error: error.message || error,
+      });
+    }
+  };
 
   // Obtiene transacciones del usuario autenticado
-  static async obtenerTransacciones(req: Request, res: Response) {
+  obtenerTransaccionesPorUsuario = async (req: AuthRequest, res: Response) => {
     try {
-      const user = (req as any).user;
-      if (!user || !user.id) {
+      const user = req.user;
+      if (!user || !user.id_usuario) {
         return res.status(401).json({ message: "Usuario no autenticado" });
       }
 
-      const transacciones = await transaccionRepository.findByUserId(user.id);
+      const transacciones =
+        await this.transaccionService.obtenerTransaccionesUsuario(
+          user.id_usuario,
+        );
       return res.json(transacciones);
-    } catch (error: any) {
-      console.error("Error al obtener transacciones:", error);
-      return res.status(500).json({
+    } catch (error) {
+      res.status(500).json({
         message: "Error al obtener las transacciones",
-        error: error.message,
+        error: error.message || error,
       });
     }
-  }
+  };
 
   // Obtiene resumen financiero del usuario autenticado
-  static async obtenerResumen(req: Request, res: Response) {
+  obtenerResumen = async (req: AuthRequest, res: Response) => {
     try {
-      const user = (req as any).user;
-      if (!user || !user.id) {
+      const user = req.user;
+      if (!user || !user.id_usuario) {
         return res.status(401).json({ message: "Usuario no autenticado" });
       }
 
-      const resumen = await transaccionRepository.getResumen(user.id);
+      const resumen = await this.transaccionService.obtenerResumenFinanciero(
+        user.id_usuario,
+      );
       return res.json(resumen);
-    } catch (error: any) {
-      console.error("Error al obtener resumen:", error);
-      return res.status(500).json({
+    } catch (error) {
+      res.status(500).json({
         message: "Error al obtener el resumen financiero",
-        error: error.message,
+        error: error.message || error,
       });
     }
-  }
+  };
 
   // Obtiene transacción por ID
-  static async obtenerTransaccionPorId(req: Request, res: Response) {
+  obtenerTransaccionPorId = async (req: AuthRequest, res: Response) => {
     try {
-      const id = parseInt(req.params.id);
-      if (isNaN(id)) {
+      const id_transaccion = Number(req.params.id);
+      const id_usuario = req.user.id_usuario;
+      if (Number.isNaN(id_transaccion)) {
         return res.status(400).json({ message: "ID inválido" });
       }
 
-      const transaccion = await transaccionRepository.findById(id);
+      const transaccion = await this.transaccionService.obtenerTransaccionPorId(
+        id_transaccion,
+        id_usuario,
+      );
       if (!transaccion) {
         return res.status(404).json({ message: "Transacción no encontrada" });
       }
 
       return res.json(transaccion);
-    } catch (error: any) {
-      console.error("Error al obtener transacción:", error);
-      return res.status(500).json({
+    } catch (error) {
+      res.status(500).json({
         message: "Error al obtener la transacción",
-        error: error.message,
+        error: error.message || error,
       });
     }
-  }
+  };
 
   // Actualiza transacción existente
-  static async actualizarTransaccion(req: Request, res: Response) {
+  actualizarTransaccion = async (req: AuthRequest, res: Response) => {
     try {
-      const id = parseInt(req.params.id);
-      if (isNaN(id)) {
+      const id_transaccion = Number(req.params.id);
+      const id_usuario = req.user.id_usuario;
+
+      if (Number.isNaN(id_transaccion)) {
         return res.status(400).json({ message: "ID inválido" });
       }
 
-      const data = req.body;
-      const transaccionActualizada = await transaccionRepository.update(id, data);
-
+      const data: Partial<{ id_categoria: number; monto: number; descripcion: string }> = req.body;
+      const transaccionActualizada =
+        await this.transaccionService.actualizarTransaccion(
+          id_transaccion,
+          data,
+          id_usuario,
+        );
       if (!transaccionActualizada) {
         return res.status(404).json({ message: "Transacción no encontrada" });
       }
 
       return res.json(transaccionActualizada);
-    } catch (error: any) {
-      console.error("Error al actualizar transacción:", error);
-      return res.status(500).json({
+    } catch (error) {
+      res.status(500).json({
         message: "Error al actualizar la transacción",
-        error: error.message,
+        error: error.message || error,
       });
     }
-  }
+  };
 
   // Elimina una transacción
-  static async eliminarTransaccion(req: Request, res: Response) {
+  eliminarTransaccion = async (req: AuthRequest, res: Response) => {
     try {
-      const id = parseInt(req.params.id);
-      if (isNaN(id)) {
+      const id_transaccion = Number(req.params.id);
+      const id_usuario = req.user.id_usuario;
+      if (Number.isNaN(id_transaccion)) {
         return res.status(400).json({ message: "ID inválido" });
       }
 
-      const mensaje = await transaccionRepository.delete(id);
+      const mensaje = await this.transaccionService.eliminarTransaccion(
+        id_transaccion,
+        id_usuario,
+      );
       return res.json({ message: mensaje });
-    } catch (error: any) {
-      console.error("Error al eliminar transacción:", error);
-      return res.status(500).json({
+    } catch (error) {
+      res.status(500).json({
         message: "Error al eliminar la transacción",
-        error: error.message,
+        error: error.message || error,
       });
     }
-  }
+  };
 }
