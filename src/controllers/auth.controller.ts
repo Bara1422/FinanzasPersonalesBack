@@ -1,4 +1,5 @@
 import type { Request, Response } from "express";
+import type { AuthRequest } from "../middlewares/auth.middleware";
 import type { AuthService } from "../services/auth.service";
 
 export class AuthController {
@@ -30,9 +31,9 @@ export class AuthController {
     }
   };
 
-  me = async (req: Request, res: Response) => {
+  me = async (req: AuthRequest, res: Response) => {
     try {
-      res.json((req as any).user);
+      res.json(req.user);
     } catch {
       res.status(401).json({ message: "Token no válido" });
     }

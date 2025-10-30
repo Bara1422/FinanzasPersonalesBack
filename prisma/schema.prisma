@@ -28,30 +28,28 @@ model Usuario {
   listasUsuario ListasUsuarios[]
 }
 
+enum TipoCategoria {
+  INGRESO
+  GASTO
+}
+
 model Categoria {
-  id_categoria Int    @id @default(autoincrement())
-  nombre       String @unique
+  id_categoria Int           @id @default(autoincrement())
+  nombre       String        @unique
+  tipo         TipoCategoria
 
   // Relaciones
   transacciones Transaccion[]
 }
 
-enum TipoTransaccion {
-  INGRESO
-  GASTO
-}
-
 model Transaccion {
-  id_transaccion    Int             @id @default(autoincrement())
-  id_usuario        Int
-  id_categoria      Int
-  tipo              TipoTransaccion
-  monto             Float
-  fecha             DateTime
-  fecha_vencimiento DateTime?
-  descripcion       String?
-  created_at        DateTime        @default(now())
-  updated_at        DateTime        @updatedAt
+  id_transaccion Int      @id @default(autoincrement())
+  id_usuario     Int
+  id_categoria   Int
+  monto          Float
+  descripcion    String?
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
 
   // Relaciones
   usuario        Usuario        @relation(fields: [id_usuario], references: [id_usuario])

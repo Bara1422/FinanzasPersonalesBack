@@ -1,10 +1,19 @@
 import type { NextFunction, Request, Response } from "express";
-import jwt from "jsonwebtoken";
+import jwt, { type JwtPayload } from "jsonwebtoken";
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
+interface TokenPayload extends JwtPayload {
+  id_usuario: number;
+  rol: string;
+}
+
+export interface AuthRequest extends Request {
+  user: TokenPayload;
+}
+
 export function authMiddleware(
-  req: Request,
+  req: AuthRequest,
   res: Response,
   next: NextFunction,
 ) {
@@ -16,8 +25,8 @@ export function authMiddleware(
   const token = authHeader.split(" ")[1];
 
   try {
-    const decoded = jwt.verify(token, JWT_SECRET);
-    (req as any).user = decoded;
+    const decoded = jwt.verify(token, JWT_SECRET) as TokenPayload;
+    req.user = decoded;
     next();
   } catch {
     return res.status(401).json({ message: "Token no válido" });

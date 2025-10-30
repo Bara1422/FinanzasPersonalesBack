@@ -1,4 +1,5 @@
 import type { Usuario } from "@prisma/client";
+import { toUsuarioDTO } from "../dtos/usuario.dto";
 import { userRepository } from "../repositories";
 import type { IUserRepository } from "../repositories/interfaces/IUserRepository";
 
@@ -6,7 +7,8 @@ export class UserService {
   constructor(private userRepository: IUserRepository<Usuario>) {}
 
   async getAll() {
-    return await this.userRepository.findAll();
+    const users = await this.userRepository.findAll();
+    return users.map(toUsuarioDTO);
   }
 
   async findById(id: number) {
@@ -14,7 +16,7 @@ export class UserService {
     if (!user) {
       throw new Error("Usuario no encontrado");
     }
-    return user;
+    return toUsuarioDTO(user);
   }
 
   async update(
@@ -25,7 +27,8 @@ export class UserService {
     if (!user) {
       throw new Error("Usuario no encontrado");
     }
-    return await this.userRepository.update(id, data);
+    const updatedUser = await this.userRepository.update(id, data);
+    return toUsuarioDTO(updatedUser);
   }
 
   async delete(id: number) {
