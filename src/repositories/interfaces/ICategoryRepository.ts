@@ -1,5 +1,6 @@
-import { Categoria, TipoTransaccion } from '@prisma/client';
+import type { Categoria, TipoCategoria } from "@prisma/client";
 
-export interface ICategoryRepository {
-    getCategory(tipo?: TipoTransaccion): Promise<Categoria[]>;
+export interface ICategoryRepository<T extends Categoria> {
+  getCategory(tipo: TipoCategoria): Promise<T[]>;
+  getAllCategories(): Promise<T[]>;
 }
