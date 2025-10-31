@@ -5,6 +5,7 @@ import {
 } from "../../dtos/transaccion.dto";
 import type { ResumenFinanciero } from "../../types/transaction.types";
 import type { ITransaccionRepository } from "../interfaces/ITransaccionRepository";
+import { MOCK_CATEGORIAS_DATA } from "./CategoryRepositoryMock";
 
 export class TransaccionRepositoryMock
   implements ITransaccionRepository<Transaccion>
@@ -31,13 +32,7 @@ export class TransaccionRepositoryMock
   ];
 
   // simulacion hasta tener categorias
-  private categoriasDB = [
-    { id_categoria: 1, nombre: "Salario", tipo: "INGRESO" },
-    { id_categoria: 2, nombre: "Freelance", tipo: "INGRESO" },
-    { id_categoria: 3, nombre: "Comida", tipo: "GASTO" },
-    { id_categoria: 4, nombre: "Transporte", tipo: "GASTO" },
-    { id_categoria: 5, nombre: "Entretenimiento", tipo: "GASTO" },
-  ];
+  private categoriasDB = MOCK_CATEGORIAS_DATA
 
   async findAll(): Promise<Transaccion[]> {
     return Promise.resolve(this.transaccionesDB);

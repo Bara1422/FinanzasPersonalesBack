@@ -1,31 +1,32 @@
-import { Request, Response } from 'express';
-import { TipoTransaccion } from '@prisma/client';
-import { ServiceCategory } from '../services/category.service';
+import type { TipoCategoria } from "@prisma/client";
+import type { Request, Response } from "express";
+import type { CategoryService } from "../services/category.service";
 
-const categoryService = new ServiceCategory();
+export class CategoryController {
+  constructor(private categoryService: CategoryService) {}
 
-export const getCategory = async (req: Request, res: Response) => {
+  getAllCategories = async (_req: Request, res: Response) => {
     try {
-        const tipo = req.query.tipo as TipoTransaccion | undefined;
-
-        if (tipo && !["INGRESO", "GASTO"].includes(tipo)) {
-            return res.status(400).json({
-                ok: false,
-                error: 'Error de parametros: Tipo de transaccion no valido.'
-            });
-        }
-
-        const categorias = await categoryService.getCategory(tipo);
-
-        return res.status(200).json({
-            ok: true,
-            data: categorias
-        });
+      const categories = await this.categoryService.getAllCategories();
+      return res.json(categories);
     } catch (error) {
-        console.error('Error al obtener categorias', error);
-        return res.status(500).json({
-            ok: false,
-            error: 'Error interno del servidor'
-        });
+      res.status(500).json({
+        message: "Error al obtener las categorías",
+        error: error.message || error,
+      });
     }
-};
+  };
+
+  getCategoriesByType = async (req: Request, res: Response) => {
+    try {
+      const tipo = req.params.tipo as TipoCategoria;
+      const categories = await this.categoryService.getCategory(tipo);
+      return res.json(categories);
+    } catch (error) {
+      res.status(500).json({
+        message: "Error al obtener las categorías por tipo",
+        error: error.message || error,
+      });
+    }
+  };
+}
