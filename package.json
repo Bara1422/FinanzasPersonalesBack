@@ -9,7 +9,7 @@
     "build": "npx tsc --build",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev --name init",
-    "prisma:seed": "ts-node ./src/db/seed.ts"
+    "prisma:seed": "prisma migrate reset && ts-node ./src/db/seed.ts"
   },
   "repository": {
     "type": "git",

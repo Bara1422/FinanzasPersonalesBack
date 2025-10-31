@@ -18,6 +18,17 @@ export class UserRepositoryMock implements IUserRepository<Usuario> {
       updated_at: new Date(),
       activo: true,
     },
+    {
+      id_usuario: 2,
+      name: "User",
+      email: "user@example.com",
+      username: "user",
+      password: this.hasher.hash("1234"),
+      rol: "USER" as $Enums.Rol,
+      created_at: new Date(),
+      updated_at: new Date(),
+      activo: true,
+    },
   ];
   constructor(private hasher: BcryptAdapter) {}
 
