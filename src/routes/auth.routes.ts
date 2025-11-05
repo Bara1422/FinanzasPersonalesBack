@@ -1,11 +1,10 @@
 import { Router } from "express";
 import { AuthController } from "../controllers/auth.controller";
 import { authMiddleware } from "../middlewares/auth.middleware";
-import { userRepository } from "../repositories";
-import { AuthService } from "../services/auth.service";
+import { authService, userService } from "../services";
 
 const router = Router();
-const authController = new AuthController(new AuthService(userRepository));
+const authController = new AuthController(authService, userService);
 
 // Rutas de autenticación
 router.post("/register", authController.register);

@@ -1,4 +1,5 @@
 import "dotenv/config";
+import cors from "cors";
 import express from "express";
 import { authMiddleware } from "./middlewares/auth.middleware";
 import authRoutes from "./routes/auth.routes";
@@ -8,7 +9,14 @@ import userRoutes from "./routes/usuario.router";
 
 const app = express();
 
+const corsOptions = {
+  origin: process.env.CORS_ORIGIN || "*",
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  allowedHeaders: "Content-Type,Authorization",
+};
+
 app.use(express.json());
+app.use(cors(corsOptions));
 
 /* sin auth */
 app.use("/auth", authRoutes);

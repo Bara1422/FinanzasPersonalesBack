@@ -2,7 +2,7 @@ import type { $Enums, Usuario } from "@prisma/client";
 
 export interface UsuarioDTO {
   id_usuario: number;
-  name: string;
+  nombre: string;
   email: string;
   username: string;
   rol: $Enums.Rol;
@@ -12,7 +12,7 @@ export interface UsuarioDTO {
 export const toUsuarioDTO = (usuario: Usuario): UsuarioDTO => {
   return {
     id_usuario: usuario.id_usuario,
-    name: usuario.name,
+    nombre: usuario.name,
     email: usuario.email,
     username: usuario.username,
     rol: usuario.rol,
