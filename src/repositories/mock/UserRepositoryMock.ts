@@ -6,31 +6,33 @@ import type { IUserRepository } from "../interfaces/IUserRepository";
 // para tener una contraseña válida en el mock
 
 export class UserRepositoryMock implements IUserRepository<Usuario> {
-  private usuariosDB: Usuario[] = [
-    {
-      id_usuario: 1,
-      name: "Admin",
-      email: "admin@example.com",
-      username: "admin",
-      password: this.hasher.hash("1234"),
-      rol: "ADMIN" as $Enums.Rol,
-      created_at: new Date(),
-      updated_at: new Date(),
-      activo: true,
-    },
-    {
-      id_usuario: 2,
-      name: "User",
-      email: "user@example.com",
-      username: "user",
-      password: this.hasher.hash("1234"),
-      rol: "USER" as $Enums.Rol,
-      created_at: new Date(),
-      updated_at: new Date(),
-      activo: true,
-    },
-  ];
-  constructor(private hasher: BcryptAdapter) {}
+  private usuariosDB: Usuario[] = [];
+  constructor(private hasher: BcryptAdapter) {
+    this.usuariosDB = [
+      {
+        id_usuario: 1,
+        name: "Admin",
+        email: "admin@example.com",
+        username: "admin",
+        password: this.hasher.hash("123456"),
+        rol: "ADMIN" as $Enums.Rol,
+        created_at: new Date(),
+        updated_at: new Date(),
+        activo: true,
+      },
+      {
+        id_usuario: 2,
+        name: "User",
+        email: "user@example.com",
+        username: "user",
+        password: this.hasher.hash("123456"),
+        rol: "USER" as $Enums.Rol,
+        created_at: new Date(),
+        updated_at: new Date(),
+        activo: true,
+      },
+    ];
+  }
 
   async findByEmail(email: string): Promise<Usuario | null> {
     const usuario = this.usuariosDB.find((user) => user.email === email);
@@ -78,6 +80,7 @@ export class UserRepositoryMock implements IUserRepository<Usuario> {
       updated_at: data.updated_at || new Date(),
       activo: true,
     };
+    
     this.usuariosDB.push(newUsuario);
     return Promise.resolve(newUsuario);
   }
