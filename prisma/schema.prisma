@@ -26,6 +26,7 @@ model Usuario {
   // Relaciones
   transacciones Transaccion[]
   listasUsuario ListasUsuarios[]
+  notificacions Notificacion[]
 }
 
 enum TipoCategoria {
@@ -40,6 +41,7 @@ model Categoria {
 
   // Relaciones
   transacciones Transaccion[]
+  notificacions Notificacion[]
 }
 
 model Transaccion {
@@ -47,14 +49,13 @@ model Transaccion {
   id_usuario     Int
   id_categoria   Int
   monto          Float
-  descripcion    String?
+  descripcion    String
   created_at     DateTime @default(now())
   updated_at     DateTime @updatedAt
 
   // Relaciones
-  usuario        Usuario        @relation(fields: [id_usuario], references: [id_usuario])
-  categoria      Categoria      @relation(fields: [id_categoria], references: [id_categoria])
-  notificaciones Notificacion[]
+  usuario   Usuario   @relation(fields: [id_usuario], references: [id_usuario])
+  categoria Categoria @relation(fields: [id_categoria], references: [id_categoria])
 }
 
 enum EstadoNotificacion {
@@ -69,17 +70,20 @@ enum Prioridad {
 }
 
 model Notificacion {
-  id_notificacion Int                @id @default(autoincrement())
-  id_transaccion  Int
-  mensaje         String
-  estado          EstadoNotificacion @default(PENDIENTE)
-  prioridad       Prioridad          @default(MEDIA)
-  fecha_evento    DateTime
-  created_at      DateTime           @default(now())
-  updated_at      DateTime           @updatedAt
+  id_notificacion   Int       @id @default(autoincrement())
+  id_usuario        Int
+  id_categoria      Int
+  descripcion       String
+  monto             Float
+  prioridad         Prioridad @default(MEDIA)
+  fecha_vencimiento DateTime
+  pagado            Boolean   @default(false)
+  created_at        DateTime  @default(now())
+  updated_at        DateTime  @updatedAt
 
   // Relaciones
-  transaccion Transaccion @relation(fields: [id_transaccion], references: [id_transaccion])
+  usuario   Usuario   @relation(fields: [id_usuario], references: [id_usuario])
+  categoria Categoria @relation(fields: [id_categoria], references: [id_categoria])
 }
 
 model ListaCompras {

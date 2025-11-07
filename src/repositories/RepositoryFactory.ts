@@ -11,12 +11,16 @@ export class RepositoryFactory {
         TransaccionRepositoryMock,
       } = require("./mock/TransaccionRepositoryMock");
       const {
+        NotificacionRepositoryMock,
+      } = require("./mock/NotificacionRepositoryMock");
+      const {
         CategoryRepositoryMock,
       } = require("./mock/CategoryRepositoryMock");
       return {
         userRepository: new UserRepositoryMock(hasher),
         transactionRepository: new TransaccionRepositoryMock(),
         categoryRepository: new CategoryRepositoryMock(),
+        notificacionRepository: new NotificacionRepositoryMock(),
       };
     } else {
       const { UserRepositoryPrisma } = require("./prisma/UserRepositoryPrisma");
