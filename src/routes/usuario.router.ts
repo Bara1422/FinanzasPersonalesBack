@@ -1,11 +1,10 @@
 import { Router } from "express";
 import { UserController } from "../controllers/usuario.controller";
 import { isAdmin } from "../middlewares/user-rol.middleware";
-import { userRepository } from "../repositories";
-import { UserService } from "../services/usuario.service";
+import { userService } from "../services";
 
 const router = Router();
-const userController = new UserController(new UserService(userRepository));
+const userController = new UserController(userService);
 
 router.get("/", isAdmin, userController.getAll);
 router.get("/:id", userController.getById);

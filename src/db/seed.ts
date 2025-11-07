@@ -1,11 +1,15 @@
 import {
   type Categoria,
+  type Notificacion,
   PrismaClient,
   type Transaccion,
   type Usuario,
 } from "@prisma/client";
 import { BcryptAdapter } from "../config/bcrypt";
-import { MOCK_CATEGORIAS_DATA } from "../repositories/mock/CategoryRepositoryMock";
+import { categoriasMock } from "../repositories/mock/data/categoria.data";
+import { notificacionesMock } from "../repositories/mock/data/notificacion.data";
+import { transaccionesMock } from "../repositories/mock/data/transaccion.data";
+import { userMock } from "../repositories/mock/data/user.data";
 
 const prisma = new PrismaClient();
 
@@ -14,6 +18,7 @@ class Seed {
   private usuarios: Usuario[] = [];
   private categorias: Categoria[] = [];
   private transacciones: Transaccion[] = [];
+  private notificaciones: Notificacion[] = [];
 
   constructor(private prisma: PrismaClient) {
     this.hasher = new BcryptAdapter();
@@ -32,28 +37,21 @@ class Seed {
 
   async seedUser(): Promise<void> {
     console.log("Creando usuarios...");
-    const admin = await this.prisma.usuario.create({
-      data: {
-        name: "Admin",
-        email: "admin@example.com",
-        password: this.hasher.hash("1234"),
-        username: "admin",
-        rol: "ADMIN",
-        activo: true,
-      },
-    });
-
-    const user = await this.prisma.usuario.create({
-      data: {
-        name: "User",
-        email: "user@example.com",
-        password: this.hasher.hash("1234"),
-        username: "user",
-        rol: "USER",
-        activo: true,
-      },
-    });
-    this.usuarios.push(admin, user);
+    const usersSeed = await Promise.all(
+      userMock.map((user) =>
+        this.prisma.usuario.create({
+          data: {
+            name: user.name,
+            email: user.email,
+            password: this.hasher.hash(user.password),
+            username: user.username,
+            rol: user.rol,
+            activo: user.activo,
+          },
+        }),
+      ),
+    );
+    this.usuarios = usersSeed;
     console.log("Usuarios creados:");
     console.log(this.usuarios);
   }
@@ -61,7 +59,7 @@ class Seed {
   async seedCategories(): Promise<void> {
     console.log("Creando categorías...");
     const categoriasSeed = await Promise.all(
-      MOCK_CATEGORIAS_DATA.map((cat) =>
+      categoriasMock.map((cat) =>
         this.prisma.categoria.create({
           data: {
             id_categoria: cat.id_categoria,
@@ -78,32 +76,47 @@ class Seed {
 
   async seedTransactions(): Promise<void> {
     console.log("Creando transacciones...");
-    const findCategoryByName = (name: string): Categoria | undefined => {
-      return this.categorias.find((c) => c.nombre === name);
-    };
+
     const transaccionesSeed = await Promise.all(
-      [
-        {
-          id_usuario: this.usuarios[0].id_usuario,
-          id_categoria: findCategoryByName("Salario")?.id_categoria,
-          monto: 100.5,
-          descripcion: "Depósito inicial",
-          created_at: new Date(),
-          updated_at: new Date(),
-        },
-        {
-          id_usuario: this.usuarios[0].id_usuario,
-          id_categoria: findCategoryByName("Alimentos")?.id_categoria,
-          monto: 50.0,
-          descripcion: "Compra de alimentos",
-          created_at: new Date("2024-06-15"),
-          updated_at: new Date(),
-        },
-      ].map((tran) => this.prisma.transaccion.create({ data: tran })),
+      transaccionesMock.map((tran) =>
+        this.prisma.transaccion.create({
+          data: {
+            id_usuario: tran.id_usuario,
+            id_categoria: tran.id_categoria,
+            monto: tran.monto,
+            descripcion: tran.descripcion,
+            created_at: tran.created_at,
+            updated_at: tran.updated_at,
+          },
+        }),
+      ),
     );
     this.transacciones = transaccionesSeed;
     console.log("Transacciones creadas.");
     console.log(this.transacciones);
+  }
+
+  async seedNotifications(): Promise<void> {
+    console.log("Creando notificaciones...");
+    const notificacionesSeed = await Promise.all(
+      notificacionesMock.map((notif) =>
+        this.prisma.notificacion.create({
+          data: {
+            id_usuario: notif.id_usuario,
+            id_categoria: notif.id_categoria,
+            monto: notif.monto,
+            descripcion: notif.descripcion,
+            prioridad: notif.prioridad,
+            fecha_vencimiento: notif.fecha_vencimiento,
+            pagado: notif.pagado,
+            created_at: notif.created_at,
+          },
+        }),
+      ),
+    );
+    this.notificaciones = notificacionesSeed;
+    console.log("Notificaciones creadas.");
+    console.log(this.notificaciones);
   }
 
   async seedAll(): Promise<void> {
@@ -111,6 +124,7 @@ class Seed {
     await this.seedUser();
     await this.seedCategories();
     await this.seedTransactions();
+    await this.seedNotifications();
     console.log("Seed completado.");
   }
 }

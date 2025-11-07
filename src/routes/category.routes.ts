@@ -1,12 +1,10 @@
 import { Router } from "express";
 import { CategoryController } from "../controllers/categorias.controller";
-import { categoryRepository } from "../repositories";
-import { CategoryService } from "../services/category.service";
+
+import { categoryService } from "../services";
 
 const router = Router();
-const categoryController = new CategoryController(
-  new CategoryService(categoryRepository),
-);
+const categoryController = new CategoryController(categoryService);
 
 router.get("/", categoryController.getAllCategories);
 router.get("/:tipo", categoryController.getCategoriesByType);
