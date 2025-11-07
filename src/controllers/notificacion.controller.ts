@@ -81,6 +81,29 @@ export class NotificacionController {
     }
   };
 
+  obtenerNotificacionesPagadasPorUsuario = async (
+    req: AuthRequest,
+    res: Response,
+  ) => {
+    try {
+      const user = req.user;
+      if (!user || !user.id_usuario) {
+        return res.status(401).json({ message: "Usuario no autenticado" });
+      }
+
+      const notificaciones =
+        await this.notificacionService.obtenerNotificacionesPagadasUsuario(
+          user.id_usuario,
+        );
+      return res.json(notificaciones);
+    } catch (error) {
+      return res.status(500).json({
+        message: "Error al obtener las notificaciones",
+        error: error.message || error,
+      });
+    }
+  };
+
   obtenerNotificacionPorId = async (req: AuthRequest, res: Response) => {
     try {
       const user = req.user;

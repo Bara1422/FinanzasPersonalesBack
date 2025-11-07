@@ -18,6 +18,10 @@ router.get(
   "/pending",
   notificacionController.obtenerNotificacionesPendientesPorUsuario,
 );
+router.get(
+  "/paid",
+  notificacionController.obtenerNotificacionesPagadasPorUsuario,
+);
 router.get("/:id", notificacionController.obtenerNotificacionPorId);
 router.patch("/:id", notificacionController.actualizarNotificacion);
 router.delete("/:id", notificacionController.eliminarNotificacion);
