@@ -29,10 +29,19 @@ export class TransaccionRepositoryMock
       created_at: new Date("2024-06-15"),
       updated_at: new Date(),
     },
+    {
+      id_transaccion: 3,
+      id_usuario: 1,
+      id_categoria: 10,
+      monto: 2000.0,
+      descripcion: "Salario mensual",
+      created_at: new Date("2025-11-06"),
+      updated_at: new Date(),
+    },
   ];
 
   // simulacion hasta tener categorias
-  private categoriasDB = MOCK_CATEGORIAS_DATA
+  private categoriasDB = MOCK_CATEGORIAS_DATA;
 
   async findAll(): Promise<Transaccion[]> {
     return Promise.resolve(this.transaccionesDB);
