@@ -60,6 +60,16 @@ export class NotificacionService {
     return notificacionesPendientes.map(toNotificacionDTO);
   }
 
+  async obtenerNotificacionesPagadasUsuario(id_usuario: number) {
+    if (!id_usuario) {
+      throw new Error("ID de usuario no válido");
+    }
+    const notificacionesPagadas =
+      await this.notificacionRepository.findPaidByUserId(id_usuario);
+
+    return notificacionesPagadas.map(toNotificacionDTO);
+  }
+
   async obtenerNotificacionPorId(id_notificacion: number, id_usuario: number) {
     if (!id_notificacion) {
       throw new Error("ID de notificación no válido");

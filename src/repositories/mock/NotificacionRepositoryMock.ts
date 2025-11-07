@@ -30,6 +30,14 @@ export class NotificacionRepositoryMock
     );
     return Promise.resolve(notificaciones);
   }
+
+  async findPaidByUserId(id_usuario: number): Promise<Notificacion[]> {
+    const notificaciones = this.notificacionesDB.filter(
+      (n) => n.id_usuario === id_usuario && n.pagado,
+    );
+    return Promise.resolve(notificaciones);
+  }
+
   async create(
     data: Partial<Notificacion>,
     id_usuario: number,
