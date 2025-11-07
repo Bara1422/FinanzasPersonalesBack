@@ -7,7 +7,7 @@ export interface NotificacionDTO {
   descripcion: string;
   monto: number;
   prioridad: $Enums.Prioridad;
-  fecha_vencimiento: Date;
+  fecha_vencimiento: string;
   pagado: boolean;
 }
 
@@ -19,7 +19,16 @@ export function toNotificacionDTO(notificacion: Notificacion): NotificacionDTO {
     descripcion: notificacion.descripcion,
     monto: notificacion.monto,
     prioridad: notificacion.prioridad,
-    fecha_vencimiento: notificacion.fecha_vencimiento,
+    fecha_vencimiento: notificacion.fecha_vencimiento
+      .toISOString()
+      .split("T")[0],
     pagado: notificacion.pagado,
   };
+}
+export function parseDate(dateString: string): Date {
+  const date = new Date(dateString);
+  if (Number.isNaN(date.getTime())) {
+    throw new Error(`Fecha inválida: ${dateString}`);
+  }
+  return date;
 }

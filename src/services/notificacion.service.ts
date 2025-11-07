@@ -1,5 +1,9 @@
 import type { Notificacion } from "@prisma/client";
-import { toNotificacionDTO } from "../dtos/notificacion.dto";
+import {
+  type NotificacionDTO,
+  parseDate,
+  toNotificacionDTO,
+} from "../dtos/notificacion.dto";
 import type { INotificacionRepository } from "../repositories/interfaces/INotificacionRepository";
 
 export class NotificacionService {
@@ -7,7 +11,7 @@ export class NotificacionService {
     private notificacionRepository: INotificacionRepository<Notificacion>,
   ) {}
 
-  async crearNotificacion(data: Partial<Notificacion>, id_usuario: number) {
+  async crearNotificacion(data: Partial<NotificacionDTO>, id_usuario: number) {
     if (!id_usuario) {
       throw new Error("Falta el ID del usuario");
     }
@@ -15,9 +19,17 @@ export class NotificacionService {
     if (!data.monto || data.monto <= 0) {
       throw new Error("El monto debe ser mayor que 0");
     }
+    if (!data.fecha_vencimiento) {
+      throw new Error("La fecha de vencimiento es obligatoria");
+    }
+
+    const dataConFecha: Partial<Notificacion> = {
+      ...data,
+      fecha_vencimiento: parseDate(data.fecha_vencimiento),
+    };
 
     const nuevaNotificacion = await this.notificacionRepository.create(
-      data,
+      dataConFecha,
       id_usuario,
     );
     return toNotificacionDTO(nuevaNotificacion);
@@ -63,7 +75,7 @@ export class NotificacionService {
 
   async actualizarNotificacion(
     id_notificacion: number,
-    data: Partial<Notificacion>,
+    data: Partial<NotificacionDTO>,
     id_usuario: number,
   ) {
     if (!id_notificacion) {
@@ -80,9 +92,15 @@ export class NotificacionService {
       throw new Error("No tienes permiso para actualizar esta notificación");
     }
 
+    const dataConFecha: Partial<Notificacion> = {
+      ...data,
+      ...(data.fecha_vencimiento && {
+        fecha_vencimiento: parseDate(data.fecha_vencimiento),
+      }),
+    };
     const notificacionActualizada = await this.notificacionRepository.update(
       id_notificacion,
-      data,
+      dataConFecha,
     );
     return toNotificacionDTO(notificacionActualizada);
   }
