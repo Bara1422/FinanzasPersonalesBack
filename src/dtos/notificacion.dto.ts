@@ -7,7 +7,7 @@ export interface NotificacionDTO {
   descripcion: string;
   monto: number;
   prioridad: $Enums.Prioridad;
-  fecha_vencimiento: string;
+  fecha_vencimiento: Date;
   pagado: boolean;
 }
 
@@ -19,9 +19,7 @@ export function toNotificacionDTO(notificacion: Notificacion): NotificacionDTO {
     descripcion: notificacion.descripcion,
     monto: notificacion.monto,
     prioridad: notificacion.prioridad,
-    fecha_vencimiento: notificacion.fecha_vencimiento
-      .toISOString()
-      .split("T")[0],
+    fecha_vencimiento: notificacion.fecha_vencimiento,
     pagado: notificacion.pagado,
   };
 }
