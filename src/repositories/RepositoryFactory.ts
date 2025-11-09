@@ -1,36 +1,46 @@
 import { BcryptAdapter } from "../config/bcrypt";
 
 export class RepositoryFactory {
+  private static hasher = new BcryptAdapter();
   static createAllRepositories() {
     const useMock = process.env.NODE_ENV === "development";
-    const hasher = new BcryptAdapter();
 
     if (useMock) {
-      const { UserRepositoryMock } = require("./mock/UserRepositoryMock");
-      const {
-        TransaccionRepositoryMock,
-      } = require("./mock/TransaccionRepositoryMock");
-      const {
-        NotificacionRepositoryMock,
-      } = require("./mock/NotificacionRepositoryMock");
-      const {
-        CategoryRepositoryMock,
-      } = require("./mock/CategoryRepositoryMock");
-      return {
-        userRepository: new UserRepositoryMock(hasher),
-        transactionRepository: new TransaccionRepositoryMock(),
-        categoryRepository: new CategoryRepositoryMock(),
-        notificacionRepository: new NotificacionRepositoryMock(),
-      };
+      return RepositoryFactory.createMockRepositories();
     } else {
-      const { UserRepositoryPrisma } = require("./prisma/UserRepositoryPrisma");
-      const {
-        TransaccionRepositoryPrisma,
-      } = require("./prisma/TransaccionRepositoryPrisma");
-      return {
-        userRepository: new UserRepositoryPrisma(hasher),
-        transactionRepository: new TransaccionRepositoryPrisma(),
-      };
+      return RepositoryFactory.createPrismaRepositories();
     }
+  }
+
+  private static createMockRepositories() {
+    const {
+      UserRepositoryMock,
+      TransaccionRepositoryMock,
+      NotificacionRepositoryMock,
+      CategoryRepositoryMock,
+    } = require("./mock");
+
+    return {
+      userRepository: new UserRepositoryMock(RepositoryFactory.hasher),
+      transactionRepository: new TransaccionRepositoryMock(),
+      categoryRepository: new CategoryRepositoryMock(),
+      notificacionRepository: new NotificacionRepositoryMock(),
+    };
+  }
+
+  private static createPrismaRepositories() {
+    const {
+      UserRepositoryPrisma,
+      TransaccionRepositoryPrisma,
+      NotificacionRepositoryPrisma,
+      CategoryRepositoryPrisma,
+    } = require("./prisma");
+
+    return {
+      userRepository: new UserRepositoryPrisma(RepositoryFactory.hasher),
+      transactionRepository: new TransaccionRepositoryPrisma(),
+      categoryRepository: new CategoryRepositoryPrisma(),
+      notificacionRepository: new NotificacionRepositoryPrisma(),
+    };
   }
 }

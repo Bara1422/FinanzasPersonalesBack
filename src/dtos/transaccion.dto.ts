@@ -6,7 +6,7 @@ export interface TransaccionDTO {
   id_categoria: number;
   monto: number;
   descripcion: string | null;
-  fecha: string;
+  fecha: Date;
 }
 
 export function toTransaccionDTO(transaccion: Transaccion): TransaccionDTO {
@@ -16,6 +16,6 @@ export function toTransaccionDTO(transaccion: Transaccion): TransaccionDTO {
     id_categoria: transaccion.id_categoria,
     monto: transaccion.monto,
     descripcion: transaccion.descripcion,
-    fecha: transaccion.created_at.toISOString().split("T")[0],
+    fecha: transaccion.created_at,
   };
 }

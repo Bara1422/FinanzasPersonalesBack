@@ -1,7 +1,6 @@
 import type { Notificacion } from "@prisma/client";
 import {
   type NotificacionDTO,
-  parseDate,
   toNotificacionDTO,
 } from "../dtos/notificacion.dto";
 import type { INotificacionRepository } from "../repositories/interfaces/INotificacionRepository";
@@ -23,13 +22,8 @@ export class NotificacionService {
       throw new Error("La fecha de vencimiento es obligatoria");
     }
 
-    const dataConFecha: Partial<Notificacion> = {
-      ...data,
-      fecha_vencimiento: parseDate(data.fecha_vencimiento),
-    };
-
     const nuevaNotificacion = await this.notificacionRepository.create(
-      dataConFecha,
+      data,
       id_usuario,
     );
     return toNotificacionDTO(nuevaNotificacion);
@@ -46,7 +40,7 @@ export class NotificacionService {
     }
     const notificacionesPorUsuario =
       await this.notificacionRepository.findByUserId(id_usuario);
-
+    console.log(notificacionesPorUsuario)
     return notificacionesPorUsuario.map(toNotificacionDTO);
   }
 
@@ -101,16 +95,10 @@ export class NotificacionService {
     if (existente.id_usuario !== id_usuario) {
       throw new Error("No tienes permiso para actualizar esta notificación");
     }
-
-    const dataConFecha: Partial<Notificacion> = {
-      ...data,
-      ...(data.fecha_vencimiento && {
-        fecha_vencimiento: parseDate(data.fecha_vencimiento),
-      }),
-    };
+    
     const notificacionActualizada = await this.notificacionRepository.update(
       id_notificacion,
-      dataConFecha,
+      data,
     );
     return toNotificacionDTO(notificacionActualizada);
   }

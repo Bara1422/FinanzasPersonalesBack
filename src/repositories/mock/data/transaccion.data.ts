@@ -25,7 +25,7 @@ export const transaccionesMock: Transaccion[] = [
     id_categoria: 10,
     monto: 2000.0,
     descripcion: "Salario mensual",
-    created_at: new Date("2025-11-06"),
+    created_at: new Date("2025-11-09"),
     updated_at: new Date(),
   },
 ];
