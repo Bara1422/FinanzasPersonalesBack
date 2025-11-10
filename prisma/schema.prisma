@@ -22,6 +22,7 @@ model Usuario {
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
   activo     Boolean  @default(true)
+  reportes    Reporte[] 
 
   // Relaciones
   transacciones Transaccion[]
@@ -123,4 +124,17 @@ model ListasUsuarios {
   // Relaciones
   lista   ListaCompras @relation(fields: [id_lista], references: [id_lista])
   usuario Usuario      @relation(fields: [id_usuario], references: [id_usuario])
+}
+model Reporte {
+  id_reporte       Int      @id @default(autoincrement())
+  id_usuario       Int
+  titulo           String
+  descripcion      String?
+  fecha_generacion DateTime @default(now())
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
+
+  // Relaciones
+  usuario Usuario @relation(fields: [id_usuario], references: [id_usuario])
+
 }

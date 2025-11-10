@@ -1,6 +1,5 @@
 import { RepositoryFactory } from "./RepositoryFactory";
 
-const repositories = RepositoryFactory.createAllRepositories();
-
-export const { userRepository, transactionRepository } = repositories;
-
+export const userRepository = RepositoryFactory.getUserRepository();
+export const transaccionRepository = RepositoryFactory.getTransaccionRepository();
+export const reportRepository = RepositoryFactory.getReportRepository();

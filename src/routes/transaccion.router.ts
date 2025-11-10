@@ -2,12 +2,12 @@ import { Router } from "express";
 import { TransaccionController } from "../controllers/transaccion.controller";
 import { authMiddleware } from "../middlewares/auth.middleware";
 import { isAdmin } from "../middlewares/user-rol.middleware";
-import { transactionRepository } from "../repositories";
+import { transaccionRepository } from "../repositories";
 import { TransaccionService } from "../services/transaccion.service";
 
 const router = Router();
 const transactionController = new TransaccionController(
-  new TransaccionService(transactionRepository),
+  new TransaccionService(transaccionRepository),
 );
 router.use(authMiddleware);
 
