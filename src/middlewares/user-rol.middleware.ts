@@ -11,7 +11,6 @@ export const isAdmin = (
   if (!user) {
     return res.status(401).json({ message: "No autorizado" });
   }
-  console.log(user);
 
   if (user.rol !== "ADMIN") {
     return res
