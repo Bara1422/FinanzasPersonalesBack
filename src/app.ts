@@ -2,6 +2,7 @@ import "dotenv/config";
 import cors from "cors";
 import express from "express";
 import { authMiddleware } from "./middlewares/auth.middleware";
+import { errorHandler } from "./middlewares/custom-error.middleware";
 import authRoutes from "./routes/auth.routes";
 import categoryRoutes from "./routes/category.routes";
 import notificacionRoutes from "./routes/notificacion.router";
@@ -30,5 +31,7 @@ app.use("/usuarios", userRoutes);
 app.use("/transacciones", transaccionRoutes);
 app.use("/notificaciones", notificacionRoutes);
 app.use("/reportes", reportRoutes);
+
+app.use(errorHandler);
 
 export default app;

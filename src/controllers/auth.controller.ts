@@ -1,7 +1,8 @@
-import type { Request, Response } from "express";
+import type { NextFunction, Request, Response } from "express";
 import type { AuthRequest } from "../middlewares/auth.middleware";
 import type { AuthService } from "../services/auth.service";
 import type { UserService } from "../services/usuario.service";
+import { CustomError } from "../utils/CustomError";
 
 export class AuthController {
   constructor(
@@ -9,52 +10,51 @@ export class AuthController {
     private userService: UserService,
   ) {}
 
-  register = async (req: Request, res: Response) => {
+  register = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { nombre, ...rest } = req.body;
       const userData = { name: nombre, ...rest };
-      const result = await this.authService.registerUsuario(userData);
-      if (!result) {
-        return res.status(400).json({ message: "Error al registrar usuario" });
+      if (
+        !userData.email ||
+        !userData.password ||
+        !userData.name ||
+        !userData.username
+      ) {
+        throw new CustomError("Faltan datos requeridos", 400);
       }
-      res.status(201).json(result);
+      const result = await this.authService.registerUsuario(userData);
+      return res.status(201).json(result);
     } catch (error) {
-      res.status(500).json({
-        message: "Error al registrar usuarios",
-        error: error.message || error,
-      });
+      next(error);
     }
   };
 
-  login = async (req: Request, res: Response) => {
+  login = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { email, password } = req.body;
+
+      if (!email || !password) {
+        throw new CustomError("Faltan credenciales", 400);
+      }
+
       const result = await this.authService.login(email, password);
-      if (!result) {
-        return res.status(401).json({ message: "Credenciales inválidas" });
-      }
-      res.status(200).json(result);
+      return res.status(200).json(result);
     } catch (error) {
-      if (error.message === "Credenciales inválidas") {
-        return res.status(401).json({ message: "Credenciales inválidas" });
-      }
-      res.status(500).json({
-        message: "Error al iniciar sesión",
-        error: error.message || error,
-      });
+      next(error);
     }
   };
 
-  me = async (req: AuthRequest, res: Response) => {
+  me = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
       const userId = req.user.id_usuario;
+      if (!userId) {
+        throw new CustomError("Usuario no autenticado", 401);
+      }
+
       const user = await this.userService.findById(userId);
-      res.status(200).json(user);
+      return res.status(200).json(user);
     } catch (error) {
-      res.status(500).json({
-        message: "Error al obtener datos del usuario",
-        error: error.message || error,
-      });
+      next(error);
     }
   };
 }
