@@ -21,7 +21,7 @@ export class TransaccionController {
       );
       return res.status(201).json(nuevaTransaccion);
     } catch (error) {
-      res.status(500).json({
+      return res.status(500).json({
         message: "Error al obtener usuario",
         error: error.message || error,
       });
@@ -35,7 +35,7 @@ export class TransaccionController {
         await this.transaccionService.obtenerTodasLasTransacciones();
       return res.json(transacciones);
     } catch (error) {
-      res.status(500).json({
+      return res.status(500).json({
         message: "Error al obtener las transacciones",
         error: error.message || error,
       });
@@ -56,7 +56,7 @@ export class TransaccionController {
         );
       return res.json(transacciones);
     } catch (error) {
-      res.status(500).json({
+      return res.status(500).json({
         message: "Error al obtener las transacciones",
         error: error.message || error,
       });
@@ -76,7 +76,7 @@ export class TransaccionController {
       );
       return res.json(resumen);
     } catch (error) {
-      res.status(500).json({
+      return res.status(500).json({
         message: "Error al obtener el resumen financiero",
         error: error.message || error,
       });
@@ -106,7 +106,7 @@ export class TransaccionController {
 
       return res.json(transaccion);
     } catch (error) {
-      res.status(500).json({
+      return res.status(500).json({
         message: "Error al obtener la transacción",
         error: error.message || error,
       });
@@ -140,7 +140,7 @@ export class TransaccionController {
 
       return res.json(transaccionActualizada);
     } catch (error) {
-      res.status(500).json({
+      return res.status(500).json({
         message: "Error al actualizar la transacción",
         error: error.message || error,
       });
@@ -162,7 +162,7 @@ export class TransaccionController {
       );
       return res.json({ message: mensaje });
     } catch (error) {
-      res.status(500).json({
+      return res.status(500).json({
         message: "Error al eliminar la transacción",
         error: error.message || error,
       });

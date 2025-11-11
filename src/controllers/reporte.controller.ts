@@ -30,9 +30,9 @@ export class ReporteController {
         `attachment; filename="${nombreArchivo}"`,
       );
       res.setHeader("Access-Control-Expose-Headers", "Content-Disposition");
-      res.send(buffer);
+      return res.send(buffer);
     } catch (error) {
-      res.status(500).json({
+      return res.status(500).json({
         message: "Error al generar el reporte",
         error: error.message || error,
       });

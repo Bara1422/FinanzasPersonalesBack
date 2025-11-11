@@ -10,7 +10,7 @@ export class CategoryController {
       const categories = await this.categoryService.getAllCategories();
       return res.json(categories);
     } catch (error) {
-      res.status(500).json({
+      return res.status(500).json({
         message: "Error al obtener las categorías",
         error: error.message || error,
       });
@@ -23,7 +23,7 @@ export class CategoryController {
       const categories = await this.categoryService.getCategory(tipo);
       return res.json(categories);
     } catch (error) {
-      res.status(500).json({
+      return res.status(500).json({
         message: "Error al obtener las categorías por tipo",
         error: error.message || error,
       });

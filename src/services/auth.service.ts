@@ -2,6 +2,7 @@ import type { Usuario } from "@prisma/client";
 import jwt from "jsonwebtoken";
 import { toUsuarioDTO } from "../dtos/usuario.dto";
 import type { IUserRepository } from "../repositories/interfaces/IUserRepository";
+import { CustomError } from "../utils/CustomError";
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -15,13 +16,13 @@ export class AuthService {
     password: string;
   }) {
     const existingEmail = await this.userRepository.findByEmail(data.email);
-    if (existingEmail) throw new Error("El correo ya está en uso");
+    if (existingEmail) throw new CustomError("El correo ya está en uso", 400);
 
     const existingUsername = await this.userRepository.findByUsername(
       data.username,
     );
     if (existingUsername)
-      throw new Error("El nombre de usuario ya está en uso");
+      throw new CustomError("El nombre de usuario ya está en uso", 400);
 
     const createdUser = await this.userRepository.create(data);
 
@@ -42,7 +43,7 @@ export class AuthService {
       email,
       password,
     );
-    if (!validatedUser) throw new Error("Credenciales inválidas");
+    if (!validatedUser) throw new CustomError("Credenciales inválidas", 401);
 
     const token = jwt.sign(
       {
@@ -52,6 +53,7 @@ export class AuthService {
       JWT_SECRET,
       { expiresIn: "24h" },
     );
+
     const userDTO = toUsuarioDTO(validatedUser);
     return { usuario: userDTO, token };
   }
