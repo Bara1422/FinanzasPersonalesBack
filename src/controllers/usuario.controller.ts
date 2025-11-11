@@ -1,6 +1,7 @@
-import type { Response } from "express";
+import type { NextFunction, Response } from "express";
 import type { AuthRequest } from "../middlewares/auth.middleware";
 import type { UserService } from "../services/usuario.service";
+import { CustomError } from "../utils/CustomError";
 
 export class UserController {
   constructor(private userService: UserService) {}
@@ -14,43 +15,48 @@ export class UserController {
     }
   };
 
-  getById = async (req: AuthRequest, res: Response) => {
+  getById = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
-      const id = req.params.id;
+      const id = Number(req.params.id);
 
       if (!id) {
-        return res.status(400).json({ message: "ID de usuario inválido" });
+        throw new CustomError("ID de usuario inválido", 400);
       }
+
       const user = await this.userService.findById(Number(id));
 
-      if (!user) {
-        return res.status(404).json({ message: "Usuario no encontrado" });
-      }
       return res.status(200).json(user);
     } catch (error) {
-      return res.status(500).json({
-        message: "Error al obtener usuario",
-        error: error.message || error,
-      });
+      next(error);
     }
   };
 
-  update = async (req: AuthRequest, res: Response) => {
+  update = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
       const id = Number(req.params.id);
+
+      if (!id) {
+        throw new CustomError("ID de usuario inválido", 400);
+      }
+
       const data: Partial<{ name: string; email: string; username: string }> =
         req.body;
+
+      if (!data.name && !data.email && !data.username) {
+        throw new CustomError(
+          "No se proporcionaron datos para actualizar",
+          400,
+        );
+      }
+
       const updatedUser = await this.userService.update(id, data);
       return res.status(200).json(updatedUser);
     } catch (error) {
-      return res.status(500).json({
-        message: "Error al actualizar usuario",
-        error: error.message || error,
-      });
+      next(error);
     }
   };
 
-  delete = async (req: AuthRequest, res: Response) => {
+  delete = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
       const id = Number(req.params.id);
 
@@ -61,10 +67,7 @@ export class UserController {
       const message = await this.userService.delete(id);
       return res.status(200).json({ message });
     } catch (error) {
-      return res.status(500).json({
-        message: "Error al eliminar usuario",
-        error: error.message || error,
-      });
+      next(error);
     }
   };
 }

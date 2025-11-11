@@ -2,6 +2,7 @@ import type { Usuario } from "@prisma/client";
 import { toUsuarioDTO } from "../dtos/usuario.dto";
 import { userRepository } from "../repositories";
 import type { IUserRepository } from "../repositories/interfaces/IUserRepository";
+import { CustomError } from "../utils/CustomError";
 
 export class UserService {
   constructor(private userRepository: IUserRepository<Usuario>) {}
@@ -14,7 +15,7 @@ export class UserService {
   async findById(id: number) {
     const user = await this.userRepository.findById(id);
     if (!user) {
-      throw new Error("Usuario no encontrado");
+      throw new CustomError("Usuario no encontrado", 404);
     }
     return toUsuarioDTO(user);
   }
@@ -25,7 +26,7 @@ export class UserService {
   ) {
     const user = await this.userRepository.findById(id);
     if (!user) {
-      throw new Error("Usuario no encontrado");
+      throw new CustomError("Usuario no encontrado", 404);
     }
     const updatedUser = await this.userRepository.update(id, data);
     return toUsuarioDTO(updatedUser);
@@ -34,7 +35,7 @@ export class UserService {
   async delete(id: number) {
     const user = await this.userRepository.findById(id);
     if (!user) {
-      throw new Error("Usuario no encontrado");
+      throw new CustomError("Usuario no encontrado", 404);
     }
     await userRepository.delete(id);
     return "Usuario eliminado correctamente";
