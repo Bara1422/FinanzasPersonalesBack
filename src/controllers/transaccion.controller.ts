@@ -1,53 +1,65 @@
-import type { Response } from "express";
+import type { NextFunction, Response } from "express";
 import type { AuthRequest } from "../middlewares/auth.middleware";
 
 import type { TransaccionService } from "../services/transaccion.service";
+import { CustomError } from "../utils/CustomError";
 
 export class TransaccionController {
   constructor(private transaccionService: TransaccionService) {}
 
-  // Crea nueva transacción
-  crearTransaccion = async (req: AuthRequest, res: Response) => {
+  crearTransaccion = async (
+    req: AuthRequest,
+    res: Response,
+    next: NextFunction,
+  ) => {
     try {
       const user = req.user;
       if (!user || !user.id_usuario) {
-        return res.status(401).json({ message: "Usuario no autenticado" });
+        throw new CustomError("Usuario no autenticado", 401);
       }
 
       const data = { ...req.body, id_usuario: user.id_usuario };
+
+      if (!data.monto || !data.id_categoria || !data.descripcion) {
+        throw new CustomError(
+          "Faltan datos requeridos para crear la transacción",
+          400,
+        );
+      }
+
       const nuevaTransaccion = await this.transaccionService.crearTransaccion(
         data,
         user.id_usuario,
       );
       return res.status(201).json(nuevaTransaccion);
     } catch (error) {
-      return res.status(500).json({
-        message: "Error al obtener usuario",
-        error: error.message || error,
-      });
+      next(error);
     }
   };
 
-  // Obtiene todas las transacciones
-  obtenerTodasLasTransacciones = async (_req: AuthRequest, res: Response) => {
+  obtenerTodasLasTransacciones = async (
+    _req: AuthRequest,
+    res: Response,
+    next: NextFunction,
+  ) => {
     try {
       const transacciones =
         await this.transaccionService.obtenerTodasLasTransacciones();
       return res.json(transacciones);
     } catch (error) {
-      return res.status(500).json({
-        message: "Error al obtener las transacciones",
-        error: error.message || error,
-      });
+      next(error);
     }
   };
 
-  // Obtiene transacciones del usuario autenticado
-  obtenerTransaccionesPorUsuario = async (req: AuthRequest, res: Response) => {
+  obtenerTransaccionesPorUsuario = async (
+    req: AuthRequest,
+    res: Response,
+    next: NextFunction,
+  ) => {
     try {
       const user = req.user;
       if (!user || !user.id_usuario) {
-        return res.status(401).json({ message: "Usuario no autenticado" });
+        throw new CustomError("Usuario no autenticado", 401);
       }
 
       const transacciones =
@@ -56,19 +68,19 @@ export class TransaccionController {
         );
       return res.json(transacciones);
     } catch (error) {
-      return res.status(500).json({
-        message: "Error al obtener las transacciones",
-        error: error.message || error,
-      });
+      next(error);
     }
   };
 
-  // Obtiene resumen financiero del usuario autenticado
-  obtenerResumen = async (req: AuthRequest, res: Response) => {
+  obtenerResumen = async (
+    req: AuthRequest,
+    res: Response,
+    next: NextFunction,
+  ) => {
     try {
       const user = req.user;
       if (!user || !user.id_usuario) {
-        return res.status(401).json({ message: "Usuario no autenticado" });
+        throw new CustomError("Usuario no autenticado", 401);
       }
 
       const resumen = await this.transaccionService.obtenerResumenFinanciero(
@@ -76,51 +88,54 @@ export class TransaccionController {
       );
       return res.json(resumen);
     } catch (error) {
-      return res.status(500).json({
-        message: "Error al obtener el resumen financiero",
-        error: error.message || error,
-      });
+      next(error);
     }
   };
 
-  // Obtiene transacción por ID
-  obtenerTransaccionPorId = async (req: AuthRequest, res: Response) => {
+  obtenerTransaccionPorId = async (
+    req: AuthRequest,
+    res: Response,
+    next: NextFunction,
+  ) => {
     try {
-      const id_transaccion = Number(req.params.id);
-      const id_usuario = req.user.id_usuario;
-      if (Number.isNaN(id_transaccion)) {
-        return res.status(400).json({ message: "ID inválido" });
+      const user = req.user;
+      if (!user || !user.id_usuario) {
+        throw new CustomError("Usuario no autenticado", 401);
       }
 
-      if (!id_usuario || !req.user) {
-        return res.status(401).json({ message: "Usuario no autenticado" });
+      const id_transaccion = Number(req.params.id);
+
+      if (!id_transaccion) {
+        throw new CustomError("ID de transacción no válido", 400);
       }
 
       const transaccion = await this.transaccionService.obtenerTransaccionPorId(
         id_transaccion,
-        id_usuario,
+        user.id_usuario,
       );
-      if (!transaccion) {
-        return res.status(404).json({ message: "Transacción no encontrada" });
-      }
 
       return res.json(transaccion);
     } catch (error) {
-      return res.status(500).json({
-        message: "Error al obtener la transacción",
-        error: error.message || error,
-      });
+      next(error);
     }
   };
 
-  // Actualiza transacción existente
-  actualizarTransaccion = async (req: AuthRequest, res: Response) => {
+  actualizarTransaccion = async (
+    req: AuthRequest,
+    res: Response,
+    next: NextFunction,
+  ) => {
     try {
-      const id_transaccion = Number(req.params.id);
-      const id_usuario = req.user.id_usuario;
+      const user = req.user;
 
-      if (Number.isNaN(id_transaccion)) {
-        return res.status(400).json({ message: "ID inválido" });
+      if (!user || !user.id_usuario) {
+        throw new CustomError("Usuario no autenticado", 401);
+      }
+
+      const id_transaccion = Number(req.params.id);
+
+      if (!id_transaccion) {
+        throw new CustomError("ID de transacción no válido", 400);
       }
 
       const data: Partial<{
@@ -128,44 +143,52 @@ export class TransaccionController {
         monto: number;
         descripcion: string;
       }> = req.body;
+
+      if (!data.id_categoria && !data.monto && !data.descripcion) {
+        throw new CustomError(
+          "No se proporcionaron datos para actualizar",
+          400,
+        );
+      }
+
       const transaccionActualizada =
         await this.transaccionService.actualizarTransaccion(
           id_transaccion,
           data,
-          id_usuario,
+          user.id_usuario,
         );
-      if (!transaccionActualizada) {
-        return res.status(404).json({ message: "Transacción no encontrada" });
-      }
 
       return res.json(transaccionActualizada);
     } catch (error) {
-      return res.status(500).json({
-        message: "Error al actualizar la transacción",
-        error: error.message || error,
-      });
+      next(error);
     }
   };
 
-  // Elimina una transacción
-  eliminarTransaccion = async (req: AuthRequest, res: Response) => {
+  eliminarTransaccion = async (
+    req: AuthRequest,
+    res: Response,
+    next: NextFunction,
+  ) => {
     try {
+      const user = req.user;
+
+      if (!user || !user.id_usuario) {
+        throw new CustomError("Usuario no autenticado", 401);
+      }
+
       const id_transaccion = Number(req.params.id);
-      const id_usuario = req.user.id_usuario;
-      if (Number.isNaN(id_transaccion)) {
-        return res.status(400).json({ message: "ID inválido" });
+
+      if (!id_transaccion) {
+        throw new CustomError("ID de transacción no válido", 400);
       }
 
       const mensaje = await this.transaccionService.eliminarTransaccion(
         id_transaccion,
-        id_usuario,
+        user.id_usuario,
       );
       return res.json({ message: mensaje });
     } catch (error) {
-      return res.status(500).json({
-        message: "Error al eliminar la transacción",
-        error: error.message || error,
-      });
+      next(error);
     }
   };
 }
