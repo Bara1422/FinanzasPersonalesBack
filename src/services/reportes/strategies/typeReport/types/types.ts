@@ -1,7 +1,7 @@
 export interface CategoriesReportData {
   Categoria: string;
   Tipo: string;
-  Total: number;
+  Total: string;
 }
 
 export interface UserReportData {
@@ -9,18 +9,18 @@ export interface UserReportData {
   Email: string;
   Username: string;
   Fecha_creacion: Date;
-  Gastos_ultimo_mes: number;
-  Ingresos_ultimo_mes: number;
-  Balance_ultimo_mes: number;
-  Total_ingresos: number;
-  Total_gastos: number;
-  Balance: number;
+  Gastos_ultimo_mes: string;
+  Ingresos_ultimo_mes: string;
+  Balance_ultimo_mes: string;
+  Total_ingresos: string;
+  Total_gastos: string;
+  Balance: string;
   Total_transacciones: number;
 }
 
 export interface TransactionsReportData {
   Fecha: Date;
-  Monto: number;
+  Monto: string;
   Categoria: string;
   Tipo: string;
   Descripción: string;

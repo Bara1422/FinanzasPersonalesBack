@@ -16,7 +16,10 @@ export class TransactionsReport implements IReportType<TransactionsReportData> {
       );
       return {
         Fecha: transaction.fecha,
-        Monto: transaction.monto,
+        Monto: transaction.monto.toLocaleString("es-AR", {
+          style: "currency",
+          currency: "ARS",
+        }),
         Categoria: category.nombre,
         Tipo: category.tipo,
         Descripción: transaction.descripcion,
