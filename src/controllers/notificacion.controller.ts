@@ -1,48 +1,67 @@
-import type { Response } from "express";
+import type { Notificacion } from "@prisma/client";
+import type { NextFunction, Response } from "express";
 import type { AuthRequest } from "../middlewares/auth.middleware";
 import type { NotificacionService } from "../services/notificacion.service";
+import { CustomError } from "../utils/CustomError";
 
 export class NotificacionController {
   constructor(private notificacionService: NotificacionService) {}
 
-  crearNotificacion = async (req: AuthRequest, res: Response) => {
+  crearNotificacion = async (
+    req: AuthRequest,
+    res: Response,
+    next: NextFunction,
+  ) => {
     try {
       const user = req.user;
       if (!user || !user.id_usuario) {
-        return res.status(401).json({ message: "Usuario no autenticado" });
+        throw new CustomError("Usuario no autenticado", 401);
       }
 
       const data = { ...req.body, id_usuario: user.id_usuario };
+      if (
+        !data.descripcion ||
+        !data.monto ||
+        !data.fecha_vencimiento ||
+        !data.id_categoria
+      ) {
+        throw new CustomError(
+          "Faltan datos requeridos para crear la notificación",
+          400,
+        );
+      }
 
       const nuevaNotificacion =
         await this.notificacionService.crearNotificacion(data, user.id_usuario);
       return res.status(201).json(nuevaNotificacion);
     } catch (error) {
-      return res.status(500).json({
-        message: "Error al crear notificación",
-        error: error.message || error,
-      });
+      next(error);
     }
   };
 
-  obtenerTodasLasNotificaciones = async (_req: AuthRequest, res: Response) => {
+  obtenerTodasLasNotificaciones = async (
+    _req: AuthRequest,
+    res: Response,
+    next: NextFunction,
+  ) => {
     try {
       const notificaciones =
         await this.notificacionService.obtenerTodasLasNotificaciones();
       return res.json(notificaciones);
     } catch (error) {
-      return res.status(500).json({
-        message: "Error al obtener las notificaciones",
-        error: error.message || error,
-      });
+      next(error);
     }
   };
 
-  obtenerNotificacionesPorUsuario = async (req: AuthRequest, res: Response) => {
+  obtenerNotificacionesPorUsuario = async (
+    req: AuthRequest,
+    res: Response,
+    next: NextFunction,
+  ) => {
     try {
       const user = req.user;
       if (!user || !user.id_usuario) {
-        return res.status(401).json({ message: "Usuario no autenticado" });
+        throw new CustomError("Usuario no autenticado", 401);
       }
 
       const notificaciones =
@@ -51,21 +70,19 @@ export class NotificacionController {
         );
       return res.json(notificaciones);
     } catch (error) {
-      return res.status(500).json({
-        message: "Error al obtener las notificaciones",
-        error: error.message || error,
-      });
+      next(error);
     }
   };
 
   obtenerNotificacionesPendientesPorUsuario = async (
     req: AuthRequest,
     res: Response,
+    next: NextFunction,
   ) => {
     try {
       const user = req.user;
       if (!user || !user.id_usuario) {
-        return res.status(401).json({ message: "Usuario no autenticado" });
+        throw new CustomError("Usuario no autenticado", 401);
       }
 
       const notificaciones =
@@ -74,21 +91,19 @@ export class NotificacionController {
         );
       return res.json(notificaciones);
     } catch (error) {
-      return res.status(500).json({
-        message: "Error al obtener las notificaciones",
-        error: error.message || error,
-      });
+      next(error);
     }
   };
 
   obtenerNotificacionesPagadasPorUsuario = async (
     req: AuthRequest,
     res: Response,
+    next: NextFunction,
   ) => {
     try {
       const user = req.user;
       if (!user || !user.id_usuario) {
-        return res.status(401).json({ message: "Usuario no autenticado" });
+        throw new CustomError("Usuario no autenticado", 401);
       }
 
       const notificaciones =
@@ -97,114 +112,136 @@ export class NotificacionController {
         );
       return res.json(notificaciones);
     } catch (error) {
-      return res.status(500).json({
-        message: "Error al obtener las notificaciones",
-        error: error.message || error,
-      });
+      next(error);
     }
   };
 
-  obtenerNotificacionPorId = async (req: AuthRequest, res: Response) => {
+  obtenerNotificacionPorId = async (
+    req: AuthRequest,
+    res: Response,
+    next: NextFunction,
+  ) => {
     try {
       const user = req.user;
       if (!user || !user.id_usuario) {
-        return res.status(401).json({ message: "Usuario no autenticado" });
+        throw new CustomError("Usuario no autenticado", 401);
       }
 
-      const { id } = req.params;
+      const id = Number(req.params.id);
+
+      if (!id) {
+        throw new CustomError("ID de notificación inválido", 400);
+      }
+
       const notificacion =
         await this.notificacionService.obtenerNotificacionPorId(
-          Number(id),
+          id,
           user.id_usuario,
         );
-      if (!notificacion) {
-        return res.status(404).json({ message: "Notificación no encontrada" });
-      }
+
       return res.json(notificacion);
     } catch (error) {
-      return res.status(500).json({
-        message: "Error al obtener la notificación",
-        error: error.message || error,
-      });
+      next(error);
     }
   };
 
-  actualizarNotificacion = async (req: AuthRequest, res: Response) => {
+  actualizarNotificacion = async (
+    req: AuthRequest,
+    res: Response,
+    next: NextFunction,
+  ) => {
     try {
       const user = req.user;
-      const { id } = req.params;
-
       if (!user || !user.id_usuario) {
-        return res.status(401).json({ message: "Usuario no autenticado" });
+        throw new CustomError("Usuario no autenticado", 401);
+      }
+      const id = Number(req.params.id);
+
+      if (!id) {
+        throw new CustomError("ID de notificación inválido", 400);
       }
 
-      const data = req.body;
+      const data: Partial<Notificacion> = req.body;
+      if (
+        !data.descripcion &&
+        !data.monto &&
+        !data.fecha_vencimiento &&
+        !data.id_categoria &&
+        !data.pagado &&
+        !data.prioridad
+      ) {
+        throw new CustomError(
+          "No se proporcionaron datos para actualizar",
+          400,
+        );
+      }
 
       const notificacionActualizada =
         await this.notificacionService.actualizarNotificacion(
-          Number(id),
+          id,
           data,
           user.id_usuario,
         );
-      if (!notificacionActualizada) {
-        return res.status(404).json({ message: "Notificación no encontrada" });
-      }
+
       return res.json(notificacionActualizada);
     } catch (error) {
-      return res.status(500).json({
-        message: "Error al actualizar la notificación",
-        error: error.message || error,
-      });
+      next(error);
     }
   };
 
-  eliminarNotificacion = async (req: AuthRequest, res: Response) => {
+  eliminarNotificacion = async (
+    req: AuthRequest,
+    res: Response,
+    next: NextFunction,
+  ) => {
     try {
       const user = req.user;
-      const { id } = req.params;
 
       if (!user || !user.id_usuario) {
-        return res.status(401).json({ message: "Usuario no autenticado" });
+        throw new CustomError("Usuario no autenticado", 401);
       }
 
-      await this.notificacionService.eliminarNotificacion(
-        Number(id),
-        user.id_usuario,
-      );
+      const id = Number(req.params.id);
+
+      if (!id) {
+        throw new CustomError("ID de notificación inválido", 400);
+      }
+
+      await this.notificacionService.eliminarNotificacion(id, user.id_usuario);
       return res
         .status(204)
         .json({ message: "Notificación eliminada correctamente" });
     } catch (error) {
-      return res.status(500).json({
-        message: "Error al eliminar la notificación",
-        error: error.message || error,
-      });
+      next(error);
     }
   };
 
-  marcarNotificacionComoPagada = async (req: AuthRequest, res: Response) => {
+  marcarNotificacionComoPagada = async (
+    req: AuthRequest,
+    res: Response,
+    next: NextFunction,
+  ) => {
     try {
       const user = req.user;
-      const { id } = req.params;
 
       if (!user || !user.id_usuario) {
-        return res.status(401).json({ message: "Usuario no autenticado" });
+        throw new CustomError("Usuario no autenticado", 401);
+      }
+      const id = Number(req.params.id);
+
+      if (!id) {
+        throw new CustomError("ID de notificación inválido", 400);
       }
 
       const notificacionActualizada =
         await this.notificacionService.marcarNotificacionComoPagada(
-          Number(id),
+          id,
           user.id_usuario,
         );
-      if (!notificacionActualizada) {
-        return res.status(404).json({ message: "Notificación no encontrada" });
-      }
+
       return res.json(notificacionActualizada);
     } catch (error) {
-      return res.status(500).json({
-        message: "Error al marcar la notificación como pagada",
-        error: error.message || error,
-      });
+      next(error);
     }
   };
 }

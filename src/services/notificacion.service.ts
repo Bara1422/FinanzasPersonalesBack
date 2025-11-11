@@ -4,6 +4,7 @@ import {
   toNotificacionDTO,
 } from "../dtos/notificacion.dto";
 import type { INotificacionRepository } from "../repositories/interfaces/INotificacionRepository";
+import { CustomError } from "../utils/CustomError";
 
 export class NotificacionService {
   constructor(
@@ -82,40 +83,39 @@ export class NotificacionService {
     data: Partial<NotificacionDTO>,
     id_usuario: number,
   ) {
-    if (!id_notificacion) {
-      throw new Error("ID de notificación no válido");
-    }
-
     const existente =
       await this.notificacionRepository.findById(id_notificacion);
     if (!existente) {
-      throw new Error("Notificación no encontrada");
+      throw new CustomError("Notificación no encontrada", 404);
     }
 
     if (existente.id_usuario !== id_usuario) {
-      throw new Error("No tienes permiso para actualizar esta notificación");
+      throw new CustomError(
+        "No tienes permiso para actualizar esta notificación",
+        403,
+      );
     }
 
     const notificacionActualizada = await this.notificacionRepository.update(
       id_notificacion,
       data,
     );
+
     return toNotificacionDTO(notificacionActualizada);
   }
 
   async eliminarNotificacion(id_notificacion: number, id_usuario: number) {
-    if (!id_notificacion) {
-      throw new Error("ID de notificación no válido");
-    }
-
     const existente =
       await this.notificacionRepository.findById(id_notificacion);
     if (!existente) {
-      throw new Error("Notificación no encontrada");
+      throw new CustomError("Notificación no encontrada", 404);
     }
 
     if (existente.id_usuario !== id_usuario) {
-      throw new Error("No tienes permiso para eliminar esta notificación");
+      throw new CustomError(
+        "No tienes permiso para eliminar esta notificación",
+        403,
+      );
     }
 
     return this.notificacionRepository.delete(id_notificacion);
@@ -125,18 +125,21 @@ export class NotificacionService {
     id_notificacion: number,
     id_usuario: number,
   ) {
-    if (!id_notificacion) {
-      throw new Error("ID de notificación no válido");
-    }
-
     const existente =
       await this.notificacionRepository.findById(id_notificacion);
 
     if (!existente) {
-      throw new Error("Notificación no encontrada");
+      throw new CustomError("Notificación no encontrada", 404);
     }
     if (existente.id_usuario !== id_usuario) {
-      throw new Error("No tienes permiso para actualizar esta notificación");
+      throw new CustomError(
+        "No tienes permiso para actualizar esta notificación",
+        403,
+      );
+    }
+
+    if (existente.pagado) {
+      throw new CustomError("La notificación ya está marcada como pagada", 400);
     }
 
     const notificacionPagada =
