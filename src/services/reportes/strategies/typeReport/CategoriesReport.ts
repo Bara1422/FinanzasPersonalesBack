@@ -23,7 +23,10 @@ export class CategoriesReport implements IReportType<CategoriesReportData> {
       return {
         Categoria: category.nombre,
         Tipo: category.tipo,
-        Total: total,
+        Total: total.toLocaleString("es-AR", {
+          style: "currency",
+          currency: "ARS",
+        }),
       };
     });
     return {
