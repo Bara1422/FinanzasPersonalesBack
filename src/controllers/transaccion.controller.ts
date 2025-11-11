@@ -92,6 +92,10 @@ export class TransaccionController {
         return res.status(400).json({ message: "ID inválido" });
       }
 
+      if (!id_usuario || !req.user) {
+        return res.status(401).json({ message: "Usuario no autenticado" });
+      }
+
       const transaccion = await this.transaccionService.obtenerTransaccionPorId(
         id_transaccion,
         id_usuario,
@@ -119,7 +123,11 @@ export class TransaccionController {
         return res.status(400).json({ message: "ID inválido" });
       }
 
-      const data: Partial<{ id_categoria: number; monto: number; descripcion: string }> = req.body;
+      const data: Partial<{
+        id_categoria: number;
+        monto: number;
+        descripcion: string;
+      }> = req.body;
       const transaccionActualizada =
         await this.transaccionService.actualizarTransaccion(
           id_transaccion,

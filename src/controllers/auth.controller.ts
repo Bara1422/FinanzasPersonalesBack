@@ -13,7 +13,6 @@ export class AuthController {
     try {
       const { nombre, ...rest } = req.body;
       const userData = { name: nombre, ...rest };
-      console.log(req.body);
       const result = await this.authService.registerUsuario(userData);
       if (!result) {
         return res.status(400).json({ message: "Error al registrar usuario" });

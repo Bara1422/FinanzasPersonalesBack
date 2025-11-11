@@ -40,7 +40,7 @@ export class NotificacionService {
     }
     const notificacionesPorUsuario =
       await this.notificacionRepository.findByUserId(id_usuario);
-    console.log(notificacionesPorUsuario)
+
     return notificacionesPorUsuario.map(toNotificacionDTO);
   }
 
@@ -95,7 +95,7 @@ export class NotificacionService {
     if (existente.id_usuario !== id_usuario) {
       throw new Error("No tienes permiso para actualizar esta notificación");
     }
-    
+
     const notificacionActualizada = await this.notificacionRepository.update(
       id_notificacion,
       data,

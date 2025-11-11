@@ -5,6 +5,7 @@ import { authMiddleware } from "./middlewares/auth.middleware";
 import authRoutes from "./routes/auth.routes";
 import categoryRoutes from "./routes/category.routes";
 import notificacionRoutes from "./routes/notificacion.router";
+import reportRoutes from "./routes/report.routes";
 import transaccionRoutes from "./routes/transaccion.router";
 import userRoutes from "./routes/usuario.router";
 
@@ -28,5 +29,6 @@ app.use(authMiddleware);
 app.use("/usuarios", userRoutes);
 app.use("/transacciones", transaccionRoutes);
 app.use("/notificaciones", notificacionRoutes);
+app.use("/reportes", reportRoutes);
 
 export default app;

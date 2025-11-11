@@ -1,4 +1,4 @@
-import type { Transaccion, Categoria } from "@prisma/client";
+import type { Transaccion } from "@prisma/client";
 import prisma from "../../db/prisma";
 import type { ITransaccionRepository } from "../interfaces/ITransaccionRepository";
 
@@ -21,21 +21,21 @@ export class TransaccionRepositoryPrisma implements ITransaccionRepository<Trans
     return await prisma.transaccion.findMany({
       where: { id_usuario },
       include: { categoria: true },
-      orderBy: { fecha: "desc" },
+      orderBy: { created_at: "desc" },
     });
   }
 
   async create(data: Partial<Transaccion>): Promise<Transaccion> {
+    if (!data.id_usuario || !data.id_categoria || data.monto === undefined) {
+      throw new Error("id_usuario, id_categoria y monto son obligatorios");
+    }
+
     return await prisma.transaccion.create({
       data: {
-        id_usuario: data.id_usuario!,
-        id_categoria: data.id_categoria!,
-        tipo: data.tipo!,
-        monto: data.monto!,
+        id_usuario: data.id_usuario,
+        id_categoria: data.id_categoria,
+        monto: data.monto,
         descripcion: data.descripcion || "",
-        fecha: data.fecha || new Date(),
-        created_at: new Date(),
-        updated_at: new Date(),
       },
       include: { categoria: true },
     });
@@ -46,7 +46,6 @@ export class TransaccionRepositoryPrisma implements ITransaccionRepository<Trans
       where: { id_transaccion: id },
       data: {
         ...data,
-        updated_at: new Date(),
       },
       include: { categoria: true },
     });
@@ -59,14 +58,14 @@ export class TransaccionRepositoryPrisma implements ITransaccionRepository<Trans
     return "Transacción eliminada correctamente";
   }
 
-  /**
-   *Devuelve un resumen financiero (mensual y total)
+  /*
+   Devuelve un resumen financiero (mensual y total)
    */
   async getResumen(id_usuario: number): Promise<any> {
     const transacciones = await prisma.transaccion.findMany({
       where: { id_usuario },
       include: { categoria: true },
-      orderBy: { fecha: "desc" },
+      orderBy: { created_at: "desc" },
     });
 
     const ahora = new Date();
@@ -75,35 +74,33 @@ export class TransaccionRepositoryPrisma implements ITransaccionRepository<Trans
 
     const delMes = transacciones.filter(
       (t) =>
-        t.fecha.getMonth() === mesActual && t.fecha.getFullYear() === añoActual
+        t.created_at.getMonth() === mesActual &&
+        t.created_at.getFullYear() === añoActual
     );
 
     const ingresosMes = delMes
-      .filter((t) => t.tipo === "INGRESO")
+      .filter((t) => t.categoria.tipo === "INGRESO")
       .reduce((sum, t) => sum + Number(t.monto), 0);
 
     const gastosMes = delMes
-      .filter((t) => t.tipo === "GASTO")
+      .filter((t) => t.categoria.tipo === "GASTO")
       .reduce((sum, t) => sum + Number(t.monto), 0);
 
     const ingresosTotales = transacciones
-      .filter((t) => t.tipo === "INGRESO")
+      .filter((t) => t.categoria.tipo === "INGRESO")
       .reduce((sum, t) => sum + Number(t.monto), 0);
 
     const gastosTotales = transacciones
-      .filter((t) => t.tipo === "GASTO")
+      .filter((t) => t.categoria.tipo === "GASTO")
       .reduce((sum, t) => sum + Number(t.monto), 0);
-
-    const balanceMes = ingresosMes - gastosMes;
-    const balanceTotal = ingresosTotales - gastosTotales;
 
     return {
       ingresosMes,
       gastosMes,
-      balanceMes,
+      balanceMes: ingresosMes - gastosMes,
       ingresosTotales,
       gastosTotales,
-      balanceTotal,
+      balanceTotal: ingresosTotales - gastosTotales,
       transacciones,
     };
   }
