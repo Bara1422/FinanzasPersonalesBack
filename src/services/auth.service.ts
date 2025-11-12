@@ -1,10 +1,9 @@
 import type { Usuario } from "@prisma/client";
 import jwt from "jsonwebtoken";
+import { ENV } from "../config/env";
 import { toUsuarioDTO } from "../dtos/usuario.dto";
 import type { IUserRepository } from "../repositories/interfaces/IUserRepository";
 import { CustomError } from "../utils/CustomError";
-
-const JWT_SECRET = process.env.JWT_SECRET;
 
 export class AuthService {
   constructor(private userRepository: IUserRepository<Usuario>) {}
@@ -31,8 +30,8 @@ export class AuthService {
         id_usuario: createdUser.id_usuario,
         rol: createdUser.rol,
       },
-      JWT_SECRET,
-      { expiresIn: "24h" },
+      ENV.JWT_SECRET,
+      { expiresIn: "1d" },
     );
     const userDTO = toUsuarioDTO(createdUser);
     return { usuario: userDTO, token };
@@ -50,8 +49,8 @@ export class AuthService {
         id_usuario: validatedUser.id_usuario,
         rol: validatedUser.rol,
       },
-      JWT_SECRET,
-      { expiresIn: "24h" },
+      ENV.JWT_SECRET,
+      { expiresIn: "1d" },
     );
 
     const userDTO = toUsuarioDTO(validatedUser);
@@ -60,7 +59,7 @@ export class AuthService {
 
   async verifyToken(token: string) {
     try {
-      return jwt.verify(token, JWT_SECRET);
+      return jwt.verify(token, ENV.JWT_SECRET);
     } catch {
       throw new Error("Token inválido");
     }

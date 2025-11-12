@@ -1,6 +1,6 @@
-import "dotenv/config";
 import cors from "cors";
 import express from "express";
+import { ENV } from "./config/env";
 import { authMiddleware } from "./middlewares/auth.middleware";
 import { errorHandler } from "./middlewares/custom-error.middleware";
 import authRoutes from "./routes/auth.routes";
@@ -13,7 +13,7 @@ import userRoutes from "./routes/usuario.router";
 const app = express();
 
 const corsOptions = {
-  origin: process.env.CORS_ORIGIN || "*",
+  origin: ENV.CORS_ORIGIN.split(","),
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   allowedHeaders: "Content-Type,Authorization",
 };
