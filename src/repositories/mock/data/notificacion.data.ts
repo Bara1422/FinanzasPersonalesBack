@@ -31,7 +31,7 @@ export const notificacionesMock: Notificacion[] = [
     id_categoria: 1, // Alimentos
     monto: 30000,
     pagado: false,
-    prioridad: $Enums.Prioridad.MEDIA,
+    prioridad: $Enums.Prioridad.ALTA,
     created_at: new Date(),
     updated_at: new Date(),
     descripcion: "Restaurante",
@@ -56,7 +56,7 @@ export const notificacionesMock: Notificacion[] = [
     monto: 600000,
     descripcion: "Alquiler",
     pagado: false,
-    prioridad: $Enums.Prioridad.MEDIA,
+    prioridad: $Enums.Prioridad.ALTA,
     created_at: new Date(),
     updated_at: new Date(),
     fecha_vencimiento: new Date("2025-12-02T00:00:00.000Z"),
