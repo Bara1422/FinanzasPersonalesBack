@@ -6,12 +6,12 @@ import { CustomError } from "../utils/CustomError";
 export class UserController {
   constructor(private userService: UserService) {}
 
-  getAll = async (_req: AuthRequest, res: Response) => {
+  getAll = async (_req: AuthRequest, res: Response, next: NextFunction) => {
     try {
       const users = await this.userService.getAll();
       return res.status(200).json(users);
-    } catch {
-      return res.status(500).json({ message: "Error al obtener usuarios" });
+    } catch (error) {
+      next(error);
     }
   };
 
@@ -75,7 +75,7 @@ export class UserController {
       const user = req.user;
 
       if (!id) {
-        return res.status(400).json({ message: "ID de usuario inválido" });
+        throw new CustomError("ID de usuario inválido", 400);
       }
 
       if (!user || !user.id_usuario) {

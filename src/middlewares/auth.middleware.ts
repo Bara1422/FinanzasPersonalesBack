@@ -1,7 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
 import jwt, { type JwtPayload } from "jsonwebtoken";
 import { ENV } from "../config/env";
-
+import { CustomError } from "../utils/CustomError";
 
 interface TokenPayload extends JwtPayload {
   id_usuario: number;
@@ -19,7 +19,7 @@ export function authMiddleware(
 ) {
   const authHeader = req.headers.authorization;
   if (!authHeader?.startsWith("Bearer ")) {
-    return res.status(401).json({ message: "Token no válido" });
+    throw new CustomError("Token de autenticación requerido", 401);
   }
 
   const token = authHeader.split(" ")[1];
@@ -29,6 +29,6 @@ export function authMiddleware(
     req.user = decoded;
     next();
   } catch {
-    return res.status(401).json({ message: "Token no válido" });
+    throw new CustomError("Token de autenticación inválido", 401);
   }
 }
