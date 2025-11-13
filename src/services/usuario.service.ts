@@ -37,7 +37,9 @@ export class UserService {
     if (!user) {
       throw new CustomError("Usuario no encontrado", 404);
     }
-    await userRepository.delete(id);
+
+    await this.userRepository.delete(id);
+
     return "Usuario eliminado correctamente";
   }
 }

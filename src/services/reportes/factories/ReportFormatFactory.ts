@@ -1,8 +1,9 @@
+import type { FormatoReporte } from "../../../schemas/reporte.schema";
 import { ExcelReportFormat } from "../strategies/formatReport/ExcelReportFormat";
 import { PDFReportFormat } from "../strategies/formatReport/PDFReportFormat";
 
 export class ReportFormatFactory {
-  static create(format: "pdf" | "excel") {
+  static create(format: FormatoReporte) {
     switch (format) {
       case "pdf":
         return new PDFReportFormat();

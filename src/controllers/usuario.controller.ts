@@ -17,15 +17,24 @@ export class UserController {
 
   getById = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
+      const user = req.user;
+
+      if (!user || !user.id_usuario) {
+        throw new CustomError("Usuario no autenticado", 401);
+      }
       const id = Number(req.params.id);
 
       if (!id) {
         throw new CustomError("ID de usuario inválido", 400);
       }
 
-      const user = await this.userService.findById(Number(id));
+      if (user.id_usuario !== id && user.rol !== "ADMIN") {
+        throw new CustomError("No autorizado para ver este usuario", 403);
+      }
 
-      return res.status(200).json(user);
+      const userFound = await this.userService.findById(Number(id));
+
+      return res.status(200).json(userFound);
     } catch (error) {
       next(error);
     }
@@ -34,7 +43,18 @@ export class UserController {
   update = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
       const id = Number(req.params.id);
+      const user = req.user;
 
+      if (!user || !user.id_usuario) {
+        throw new CustomError("Usuario no autenticado", 401);
+      }
+
+      if (user.id_usuario !== id && user.rol !== "ADMIN") {
+        throw new CustomError(
+          "No autorizado para actualizar este usuario",
+          403,
+        );
+      }
       if (!id) {
         throw new CustomError("ID de usuario inválido", 400);
       }
@@ -52,9 +72,18 @@ export class UserController {
   delete = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
       const id = Number(req.params.id);
+      const user = req.user;
 
       if (!id) {
         return res.status(400).json({ message: "ID de usuario inválido" });
+      }
+
+      if (!user || !user.id_usuario) {
+        throw new CustomError("Usuario no autenticado", 401);
+      }
+
+      if (user.id_usuario !== id && user.rol !== "ADMIN") {
+        throw new CustomError("No autorizado para eliminar este usuario", 403);
       }
 
       const message = await this.userService.delete(id);

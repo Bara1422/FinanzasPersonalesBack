@@ -3,16 +3,6 @@ import type { ZodError, ZodSchema } from "zod";
 import { CustomError } from "../utils/CustomError";
 import type { AuthRequest } from "./auth.middleware";
 
-export const getStatusCodeFromZodError = (error: ZodError): number => {
-  const hasTypeError = error.issues.some(
-    (issue) => issue.code === "invalid_type" || issue.code === "invalid_key",
-  );
-  if (hasTypeError) {
-    return 400;
-  }
-  return 422;
-};
-
 export const validate =
   <T extends ZodSchema>(
     schema: T,
@@ -27,6 +17,13 @@ export const validate =
 
       return next(new CustomError(message, 400));
     }
-    req[source] = result.data;
+
+    if (source === "query") {
+      Object.assign(req.query, result.data);
+    } else if (source === "params") {
+      Object.assign(req.params, result.data);
+    } else if (source === "body") {
+      Object.assign(req.body, result.data);
+    }
     next();
   };

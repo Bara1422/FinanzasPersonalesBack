@@ -1,13 +1,8 @@
-import type {
-  ErrorRequestHandler,
-  NextFunction,
-  Request,
-  Response,
-} from "express";
+import type { NextFunction, Request, Response } from "express";
 import { CustomError } from "../utils/CustomError";
 
 export function errorHandler(
-  err: ErrorRequestHandler,
+  err: any,
   _req: Request,
   res: Response,
   _next: NextFunction,

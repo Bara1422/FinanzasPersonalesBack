@@ -151,7 +151,6 @@ export class NotificacionController {
       }
 
       const data: Partial<Notificacion> = req.body;
-      console.log(data);
 
       const notificacionActualizada =
         await this.notificacionService.actualizarNotificacion(
