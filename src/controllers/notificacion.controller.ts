@@ -18,18 +18,10 @@ export class NotificacionController {
         throw new CustomError("Usuario no autenticado", 401);
       }
 
-      const notificacion = {
-        descripcion: req.body.descripcion,
-        monto: req.body.monto,
-        fecha_vencimiento: new Date(req.body.fecha_vencimiento),
-        id_categoria: req.body.id_categoria,
-      };
+      const data = { ...req.body, id_usuario: user.id_usuario };
 
       const nuevaNotificacion =
-        await this.notificacionService.crearNotificacion(
-          notificacion,
-          user.id_usuario,
-        );
+        await this.notificacionService.crearNotificacion(data, user.id_usuario);
       return res.status(201).json(nuevaNotificacion);
     } catch (error) {
       next(error);
@@ -159,6 +151,7 @@ export class NotificacionController {
       }
 
       const data: Partial<Notificacion> = req.body;
+      console.log(data);
 
       const notificacionActualizada =
         await this.notificacionService.actualizarNotificacion(
