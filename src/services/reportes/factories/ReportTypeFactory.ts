@@ -1,3 +1,4 @@
+import type { TipoReporte } from "../../../schemas/reporte.schema";
 import { AllUsersReport } from "../strategies/typeReport/AllUsersReport";
 import { CategoriesReport } from "../strategies/typeReport/CategoriesReport";
 import type { IReportType } from "../strategies/typeReport/IReportType";
@@ -7,7 +8,7 @@ import type { ReportData } from "../strategies/typeReport/types/types";
 import { UserReport } from "../strategies/typeReport/UserReport";
 
 export class ReportTypeFactory {
-  static getReportType(type: string): IReportType<ReportData> {
+  static getReportType(type: TipoReporte): IReportType<ReportData> {
     switch (type) {
       case "usuario":
         return new UserReport();
