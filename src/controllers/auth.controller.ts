@@ -14,14 +14,7 @@ export class AuthController {
     try {
       const { nombre, ...rest } = req.body;
       const userData = { name: nombre, ...rest };
-      if (
-        !userData.email ||
-        !userData.password ||
-        !userData.name ||
-        !userData.username
-      ) {
-        throw new CustomError("Faltan datos requeridos", 400);
-      }
+
       const result = await this.authService.registerUsuario(userData);
       return res.status(201).json(result);
     } catch (error) {
