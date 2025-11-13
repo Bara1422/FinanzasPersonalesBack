@@ -20,6 +20,9 @@ export const notificacionBaseSchema = z.object({
     .int("El ID de categoría debe ser un número entero")
     .positive("El ID de categoría debe ser un número entero positivo")
     .min(1, "Falta el ID de categoría"),
+  prioridad: z.enum(["BAJA", "MEDIA", "ALTA"], {
+    error: () => "Selecciona una prioridad válida: BAJA, MEDIA o ALTA",
+  }),
 });
 
 export const createNotificacionSchema = notificacionBaseSchema;

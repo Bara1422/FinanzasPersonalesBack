@@ -20,13 +20,6 @@ export class TransaccionController {
 
       const data = { ...req.body, id_usuario: user.id_usuario };
 
-      if (!data.monto || !data.id_categoria || !data.descripcion) {
-        throw new CustomError(
-          "Faltan datos requeridos para crear la transacción",
-          400,
-        );
-      }
-
       const nuevaTransaccion = await this.transaccionService.crearTransaccion(
         data,
         user.id_usuario,
@@ -143,13 +136,6 @@ export class TransaccionController {
         monto: number;
         descripcion: string;
       }> = req.body;
-
-      if (!data.id_categoria && !data.monto && !data.descripcion) {
-        throw new CustomError(
-          "No se proporcionaron datos para actualizar",
-          400,
-        );
-      }
 
       const transaccionActualizada =
         await this.transaccionService.actualizarTransaccion(
