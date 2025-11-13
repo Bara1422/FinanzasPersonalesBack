@@ -18,21 +18,18 @@ export class NotificacionController {
         throw new CustomError("Usuario no autenticado", 401);
       }
 
-      const data = { ...req.body, id_usuario: user.id_usuario };
-      if (
-        !data.descripcion ||
-        !data.monto ||
-        !data.fecha_vencimiento ||
-        !data.id_categoria
-      ) {
-        throw new CustomError(
-          "Faltan datos requeridos para crear la notificación",
-          400,
-        );
-      }
+      const notificacion = {
+        descripcion: req.body.descripcion,
+        monto: req.body.monto,
+        fecha_vencimiento: new Date(req.body.fecha_vencimiento),
+        id_categoria: req.body.id_categoria,
+      };
 
       const nuevaNotificacion =
-        await this.notificacionService.crearNotificacion(data, user.id_usuario);
+        await this.notificacionService.crearNotificacion(
+          notificacion,
+          user.id_usuario,
+        );
       return res.status(201).json(nuevaNotificacion);
     } catch (error) {
       next(error);
@@ -162,19 +159,6 @@ export class NotificacionController {
       }
 
       const data: Partial<Notificacion> = req.body;
-      if (
-        !data.descripcion &&
-        !data.monto &&
-        !data.fecha_vencimiento &&
-        !data.id_categoria &&
-        !data.pagado &&
-        !data.prioridad
-      ) {
-        throw new CustomError(
-          "No se proporcionaron datos para actualizar",
-          400,
-        );
-      }
 
       const notificacionActualizada =
         await this.notificacionService.actualizarNotificacion(

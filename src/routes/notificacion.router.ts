@@ -1,6 +1,11 @@
 import { Router } from "express";
 import { NotificacionController } from "../controllers/notificacion.controller";
 import { isAdmin } from "../middlewares/user-rol.middleware";
+import { validate } from "../middlewares/validate-schema.middleware";
+import {
+  createNotificacionSchema,
+  updateNotificacionSchema,
+} from "../schemas/notificacion.schema";
 import { notificacionService } from "../services";
 
 const router = Router();
@@ -12,7 +17,11 @@ router.get(
   notificacionController.obtenerTodasLasNotificaciones,
 );
 
-router.post("/", notificacionController.crearNotificacion);
+router.post(
+  "/",
+  validate(createNotificacionSchema),
+  notificacionController.crearNotificacion,
+);
 router.get("/", notificacionController.obtenerNotificacionesPorUsuario);
 router.get(
   "/pending",
@@ -23,7 +32,11 @@ router.get(
   notificacionController.obtenerNotificacionesPagadasPorUsuario,
 );
 router.get("/:id", notificacionController.obtenerNotificacionPorId);
-router.patch("/:id", notificacionController.actualizarNotificacion);
+router.patch(
+  "/:id",
+  validate(updateNotificacionSchema),
+  notificacionController.actualizarNotificacion,
+);
 router.delete("/:id", notificacionController.eliminarNotificacion);
 router.post("/:id/pagar", notificacionController.marcarNotificacionComoPagada);
 

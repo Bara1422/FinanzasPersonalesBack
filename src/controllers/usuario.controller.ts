@@ -42,13 +42,6 @@ export class UserController {
       const data: Partial<{ name: string; email: string; username: string }> =
         req.body;
 
-      if (!data.name && !data.email && !data.username) {
-        throw new CustomError(
-          "No se proporcionaron datos para actualizar",
-          400,
-        );
-      }
-
       const updatedUser = await this.userService.update(id, data);
       return res.status(200).json(updatedUser);
     } catch (error) {
