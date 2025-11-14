@@ -1,19 +1,25 @@
 import type { Transaccion } from "@prisma/client";
 import prisma from "../../db/prisma";
+import {
+  type TransaccionDTO,
+  toTransaccionDTO,
+} from "../../dtos/transaccion.dto";
+import type { ResumenFinanciero } from "../../types/transaction.types";
 import type { ITransaccionRepository } from "../interfaces/ITransaccionRepository";
 
-export class TransaccionRepositoryPrisma implements ITransaccionRepository<Transaccion> {
-  
+export class TransaccionRepositoryPrisma
+  implements ITransaccionRepository<Transaccion>
+{
   async findAll(): Promise<Transaccion[]> {
     return await prisma.transaccion.findMany({
-      include: { categoria: true },
+      include: { categoria: { select: { id_categoria: true } } },
     });
   }
 
   async findById(id: number): Promise<Transaccion | null> {
     return await prisma.transaccion.findUnique({
       where: { id_transaccion: id },
-      include: { categoria: true },
+      include: { categoria: { select: { id_categoria: true } } },
     });
   }
 
@@ -25,17 +31,16 @@ export class TransaccionRepositoryPrisma implements ITransaccionRepository<Trans
     });
   }
 
-  async create(data: Partial<Transaccion>): Promise<Transaccion> {
-    if (!data.id_usuario || !data.id_categoria || data.monto === undefined) {
-      throw new Error("id_usuario, id_categoria y monto son obligatorios");
-    }
-
+  async create(
+    data: Partial<Transaccion>,
+    id_usuario: number,
+  ): Promise<Transaccion> {
     return await prisma.transaccion.create({
       data: {
-        id_usuario: data.id_usuario,
+        id_usuario: id_usuario,
         id_categoria: data.id_categoria,
         monto: data.monto,
-        descripcion: data.descripcion || "",
+        descripcion: data.descripcion,
       },
       include: { categoria: true },
     });
@@ -61,47 +66,62 @@ export class TransaccionRepositoryPrisma implements ITransaccionRepository<Trans
   /*
    Devuelve un resumen financiero (mensual y total)
    */
-  async getResumen(id_usuario: number): Promise<any> {
-    const transacciones = await prisma.transaccion.findMany({
+  async getResumen(id_usuario: number): Promise<ResumenFinanciero> {
+    const transaccionesUsuario = await prisma.transaccion.findMany({
       where: { id_usuario },
       include: { categoria: true },
       orderBy: { created_at: "desc" },
     });
 
-    const ahora = new Date();
-    const mesActual = ahora.getMonth();
-    const añoActual = ahora.getFullYear();
+    const hoy = new Date();
+    const mesActual = hoy.getMonth();
+    const anioActual = hoy.getFullYear();
 
-    const delMes = transacciones.filter(
-      (t) =>
-        t.created_at.getMonth() === mesActual &&
-        t.created_at.getFullYear() === añoActual
-    );
+    const transaccionesMes = transaccionesUsuario.filter((t) => {
+      const fecha = new Date(t.created_at);
+      return (
+        fecha.getMonth() === mesActual && fecha.getFullYear() === anioActual
+      );
+    });
 
-    const ingresosMes = delMes
-      .filter((t) => t.categoria.tipo === "INGRESO")
-      .reduce((sum, t) => sum + Number(t.monto), 0);
+    let ingresosMes = 0;
+    let gastosMes = 0;
 
-    const gastosMes = delMes
-      .filter((t) => t.categoria.tipo === "GASTO")
-      .reduce((sum, t) => sum + Number(t.monto), 0);
+    transaccionesMes.forEach((t) => {
+      if (t.categoria.tipo === "INGRESO") {
+        ingresosMes += Number(t.monto);
+      } else {
+        gastosMes += Number(t.monto);
+      }
+    });
 
-    const ingresosTotales = transacciones
-      .filter((t) => t.categoria.tipo === "INGRESO")
-      .reduce((sum, t) => sum + Number(t.monto), 0);
+    let ingresosTotales = 0;
+    let gastosTotales = 0;
 
-    const gastosTotales = transacciones
-      .filter((t) => t.categoria.tipo === "GASTO")
-      .reduce((sum, t) => sum + Number(t.monto), 0);
+    transaccionesUsuario.forEach((t) => {
+      if (t.categoria.tipo === "INGRESO") {
+        ingresosTotales += Number(t.monto);
+      } else {
+        gastosTotales += Number(t.monto);
+      }
+    });
+
+    const transaccionesUsuarioDTO: TransaccionDTO[] =
+      transaccionesUsuario.map(toTransaccionDTO);
 
     return {
-      ingresosMes,
-      gastosMes,
-      balanceMes: ingresosMes - gastosMes,
-      ingresosTotales,
-      gastosTotales,
-      balanceTotal: ingresosTotales - gastosTotales,
-      transacciones,
+      transacciones: transaccionesUsuarioDTO,
+      resumenMensual: {
+        ingresos: ingresosMes,
+        gastos: gastosMes,
+        balance: ingresosMes - gastosMes,
+      },
+      resumenTotal: {
+        ingresos: ingresosTotales,
+        gastos: gastosTotales,
+        balance: ingresosTotales - gastosTotales,
+      },
+      cantidadTransacciones: transaccionesUsuarioDTO.length,
     };
   }
 }

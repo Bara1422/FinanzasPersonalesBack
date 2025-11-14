@@ -10,4 +10,8 @@ export class CategoryService {
   async getAllCategories(): Promise<Categoria[]> {
     return this.categoryRepository.getAllCategories();
   }
+
+  async getById(id: number): Promise<Categoria | null> {
+    return this.categoryRepository.getById(id);
+  }
 }

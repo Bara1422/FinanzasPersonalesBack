@@ -13,7 +13,10 @@ import { UserService } from "./usuario.service";
 export const userService = new UserService(userRepository);
 export const authService = new AuthService(userRepository);
 export const categoryService = new CategoryService(categoryRepository);
-export const transaccionService = new TransaccionService(transactionRepository);
+export const transaccionService = new TransaccionService(
+  transactionRepository,
+  categoryRepository,
+);
 export const notificacionService = new NotificacionService(
   notificacionRepository,
 );

@@ -35,4 +35,18 @@ export class CategoryController {
       next(error);
     }
   };
+
+  getCategoryById = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const id = Number(req.params.id_categoria);
+      if (!id) {
+        throw new CustomError("ID de categoría inválido", 400);
+      }
+      const category = await this.categoryService.getById(id);
+
+      return res.json(category);
+    } catch (error) {
+      next(error);
+    }
+  };
 }
