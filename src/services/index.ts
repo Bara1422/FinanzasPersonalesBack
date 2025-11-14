@@ -19,4 +19,5 @@ export const transaccionService = new TransaccionService(
 );
 export const notificacionService = new NotificacionService(
   notificacionRepository,
+  categoryRepository,
 );

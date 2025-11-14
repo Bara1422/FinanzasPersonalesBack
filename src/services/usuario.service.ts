@@ -1,6 +1,5 @@
 import type { Usuario } from "@prisma/client";
 import { toUsuarioDTO } from "../dtos/usuario.dto";
-import { userRepository } from "../repositories";
 import type { IUserRepository } from "../repositories/interfaces/IUserRepository";
 import { CustomError } from "../utils/CustomError";
 

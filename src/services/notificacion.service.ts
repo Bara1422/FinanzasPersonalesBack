@@ -1,26 +1,31 @@
-import type { Notificacion } from "@prisma/client";
+import type { Categoria, Notificacion } from "@prisma/client";
 import {
   type NotificacionDTO,
   toNotificacionDTO,
 } from "../dtos/notificacion.dto";
+import type { ICategoryRepository } from "../repositories/interfaces/ICategoryRepository";
 import type { INotificacionRepository } from "../repositories/interfaces/INotificacionRepository";
 import { CustomError } from "../utils/CustomError";
 
 export class NotificacionService {
   constructor(
     private notificacionRepository: INotificacionRepository<Notificacion>,
+    private categoriaRepository: ICategoryRepository<Categoria>,
   ) {}
 
   async crearNotificacion(data: Partial<NotificacionDTO>, id_usuario: number) {
-    if (!id_usuario) {
-      throw new Error("Falta el ID del usuario");
+    const categoria = await this.categoriaRepository.getById(
+      data.id_categoria as number,
+    );
+    if (!categoria) {
+      throw new CustomError("La categoría especificada no existe", 400);
     }
 
-    if (!data.monto || data.monto <= 0) {
-      throw new Error("El monto debe ser mayor que 0");
-    }
-    if (!data.fecha_vencimiento) {
-      throw new Error("La fecha de vencimiento es obligatoria");
+    if (new Date(data.fecha_vencimiento) < new Date()) {
+      throw new CustomError(
+        "La fecha de vencimiento no puede ser en el pasado",
+        400,
+      );
     }
 
     const nuevaNotificacion = await this.notificacionRepository.create(
@@ -94,6 +99,15 @@ export class NotificacionService {
         "No tienes permiso para actualizar esta notificación",
         403,
       );
+    }
+
+    if (data.id_categoria) {
+      const categoria = await this.categoriaRepository.getById(
+        data.id_categoria,
+      );
+      if (!categoria) {
+        throw new CustomError("La categoría especificada no existe", 400);
+      }
     }
 
     const notificacionActualizada = await this.notificacionRepository.update(
