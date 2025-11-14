@@ -9,14 +9,14 @@ export class ReportService {
     format: FormatoReporte,
     id_usuario: number,
   ) {
-    console.log({ type, format });
     const dataStrategy = ReportTypeFactory.getReportType(type);
     if (!dataStrategy) {
       throw new CustomError(`Tipo de reporte inválido ${type}`, 400);
     }
-    const { data, title } = await dataStrategy.generar(id_usuario);
-    const formatStrategy = ReportFormatFactory.create(format);
 
+    const { data, title } = await dataStrategy.generar(id_usuario);
+    
+    const formatStrategy = ReportFormatFactory.create(format);
     if (!formatStrategy) {
       throw new CustomError(`Formato de reporte inválido ${format}`, 400);
     }

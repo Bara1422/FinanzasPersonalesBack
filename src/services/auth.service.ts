@@ -24,6 +24,7 @@ export class AuthService {
       throw new CustomError("El nombre de usuario ya está en uso", 400);
 
     const createdUser = await this.userRepository.create(data);
+    if (!createdUser) throw new CustomError("Error al crear el usuario", 500);
 
     const token = jwt.sign(
       {
@@ -61,7 +62,7 @@ export class AuthService {
     try {
       return jwt.verify(token, ENV.JWT_SECRET);
     } catch {
-      throw new Error("Token inválido");
+      throw new CustomError("Token inválido", 401);
     }
   }
 }
