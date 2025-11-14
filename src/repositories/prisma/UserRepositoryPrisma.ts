@@ -1,7 +1,7 @@
 // src/repositories/prisma/UserRepositoryPrisma.ts
 import type { Usuario } from "@prisma/client";
-import prisma from "../../db/prisma";
 import type { BcryptAdapter } from "../../config/bcrypt";
+import prisma from "../../db/prisma";
 import type { IUserRepository } from "../interfaces/IUserRepository";
 
 /**
@@ -33,7 +33,9 @@ export class UserRepositoryPrisma implements IUserRepository<Usuario> {
 
   async create(data: Partial<Usuario>): Promise<Usuario> {
     if (!data.email || !data.password || !data.name || !data.username) {
-      throw new Error("Faltan campos obligatorios (email, password, name, username)");
+      throw new Error(
+        "Faltan campos obligatorios (email, password, name, username)",
+      );
     }
 
     // soporta hasher síncrono o asíncrono
@@ -78,7 +80,10 @@ export class UserRepositoryPrisma implements IUserRepository<Usuario> {
    * Valida credenciales: busca usuario por email y compara password.
    * Devuelve el usuario si es válido, o null si no.
    */
-  async validateCredentials(email: string, password: string): Promise<Usuario | null> {
+  async validateCredentials(
+    email: string,
+    password: string,
+  ): Promise<Usuario | null> {
     const usuario = await this.findByEmail(email);
     if (!usuario) return null;
 

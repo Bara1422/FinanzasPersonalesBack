@@ -43,7 +43,7 @@ class Seed {
           data: {
             name: user.name,
             email: user.email,
-            password: this.hasher.hash(user.password),
+            password: user.password,
             username: user.username,
             rol: user.rol,
             activo: user.activo,

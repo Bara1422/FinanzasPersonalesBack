@@ -8,5 +8,6 @@ const categoryController = new CategoryController(categoryService);
 
 router.get("/", categoryController.getAllCategories);
 router.get("/:tipo", categoryController.getCategoriesByType);
+router.get("/id/:id_categoria", categoryController.getCategoryById);
 
 export default router;

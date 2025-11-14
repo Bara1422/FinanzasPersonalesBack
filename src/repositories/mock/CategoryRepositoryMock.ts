@@ -13,4 +13,9 @@ export class CategoryRepositoryMock implements ICategoryRepository<Categoria> {
   async getAllCategories(): Promise<Categoria[]> {
     return Promise.resolve(this.categoriasDB);
   }
+
+  async getById(id: number): Promise<Categoria | null> {
+    const categoria = this.categoriasDB.find((cat) => cat.id_categoria === id);
+    return Promise.resolve(categoria || null);
+  }
 }
