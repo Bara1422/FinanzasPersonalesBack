@@ -1,7 +1,7 @@
 import { BcryptAdapter } from "../config/bcrypt";
 
 export class RepositoryFactory {
-  private static hasher = new BcryptAdapter();
+  private static hasher = BcryptAdapter.getInstance();
   static createAllRepositories() {
     const useMock = process.env.NODE_ENV === "development";
 

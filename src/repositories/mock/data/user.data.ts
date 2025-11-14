@@ -1,7 +1,7 @@
 import type { $Enums, Usuario } from "@prisma/client";
 import { BcryptAdapter } from "../../../config/bcrypt";
 
-const hasher = new BcryptAdapter();
+const hasher = BcryptAdapter.getInstance();
 
 export const userMock: Usuario[] = [
   {
