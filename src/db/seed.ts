@@ -5,7 +5,6 @@ import {
   type Transaccion,
   type Usuario,
 } from "@prisma/client";
-import { BcryptAdapter } from "../config/bcrypt";
 import { categoriasMock } from "../repositories/mock/data/categoria.data";
 import { notificacionesMock } from "../repositories/mock/data/notificacion.data";
 import { transaccionesMock } from "../repositories/mock/data/transaccion.data";
@@ -14,15 +13,12 @@ import { userMock } from "../repositories/mock/data/user.data";
 const prisma = new PrismaClient();
 
 class Seed {
-  private hasher: BcryptAdapter;
   private usuarios: Usuario[] = [];
   private categorias: Categoria[] = [];
   private transacciones: Transaccion[] = [];
   private notificaciones: Notificacion[] = [];
 
-  constructor(private prisma: PrismaClient) {
-    this.hasher = new BcryptAdapter();
-  }
+  constructor(private prisma: PrismaClient) {}
 
   async clearDB(): Promise<void> {
     console.log("Borrando base de datos..");
