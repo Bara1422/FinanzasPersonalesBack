@@ -4,7 +4,9 @@
   "description": "- Ismael Cordoba - Mariana Baradad - Juan Baranovsky - Francisco Rios - Hernan Folik",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test:ui": "vitest --ui",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "dev": "ts-node src/index.ts",
     "build": "npx tsc --build",
     "prisma:generate": "prisma generate",
@@ -41,12 +43,16 @@
     "@types/express": "^5.0.3",
     "@types/get-stream": "^3.0.1",
     "@types/jsonwebtoken": "^9.0.10",
-    "@types/node": "^24.10.0",
+    "@types/node": "^24.10.1",
     "@types/pdfkit": "^0.17.3",
     "@types/pdfmake": "^0.2.12",
+    "@types/supertest": "^6.0.3",
+    "@vitest/ui": "^4.0.9",
     "cross-env": "^10.1.0",
     "prisma": "^6.17.1",
+    "supertest": "^7.1.4",
     "ts-node": "^10.9.2",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.9"
   }
 }
