@@ -3,7 +3,7 @@ import type { ICategoryRepository } from "../interfaces/ICategoryRepository";
 import { categoriasMock } from "./data/categoria.data";
 
 export class CategoryRepositoryMock implements ICategoryRepository<Categoria> {
-  private categoriasDB: Categoria[] = categoriasMock;
+  private categoriasDB: Categoria[] = [...categoriasMock];
 
   async getCategory(tipo: TipoCategoria): Promise<Categoria[]> {
     const categorias = this.categoriasDB.filter((cat) => cat.tipo === tipo);
@@ -17,5 +17,8 @@ export class CategoryRepositoryMock implements ICategoryRepository<Categoria> {
   async getById(id: number): Promise<Categoria | null> {
     const categoria = this.categoriasDB.find((cat) => cat.id_categoria === id);
     return Promise.resolve(categoria || null);
+  }
+  reset() {
+    this.categoriasDB = [...categoriasMock];
   }
 }
