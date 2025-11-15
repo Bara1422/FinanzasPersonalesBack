@@ -1,8 +1,8 @@
 // tests/repositories/user.repository.mock.test.ts
-import { describe, it, expect, beforeEach } from "vitest";
-import { UserRepositoryMock } from "./../../src/repositories/mock/UserRepositoryMock";
+import { beforeEach, describe, expect, it } from "vitest";
 import { BcryptAdapter } from "../../src/config/bcrypt";
 import { userMock } from "./../../src/repositories/mock/data/user.data";
+import { UserRepositoryMock } from "./../../src/repositories/mock/UserRepositoryMock";
 
 let repository: UserRepositoryMock;
 const hasher = BcryptAdapter.getInstance();
@@ -62,11 +62,13 @@ describe("UserRepositoryMock", () => {
     expect(newUser.email).toBe("nuevo@example.com");
 
     const allUsers = await repository.findAll();
-    expect(allUsers.length).toBe(userMock.length );
+    expect(allUsers.length).toBe(userMock.length);
   });
 
   it("update: debe actualizar un usuario existente", async () => {
-    const updatedUser = await repository.update(1, { name: "Admin Modificado" });
+    const updatedUser = await repository.update(1, {
+      name: "Admin Modificado",
+    });
     expect(updatedUser?.name).toBe("Admin Modificado");
 
     const user = await repository.findById(1);
@@ -87,18 +89,27 @@ describe("UserRepositoryMock", () => {
   });
 
   it("validateCredentials: debe devolver usuario si email y password son correctos", async () => {
-    const user = await repository.validateCredentials("admin@example.com", "123456");
+    const user = await repository.validateCredentials(
+      "admin@example.com",
+      "123456",
+    );
     expect(user).toBeDefined();
     expect(user?.email).toBe("admin@example.com");
   });
 
   it("validateCredentials: debe devolver null si el password es incorrecto", async () => {
-    const user = await repository.validateCredentials("admin@example.com", "wrongpass");
+    const user = await repository.validateCredentials(
+      "admin@example.com",
+      "wrongpass",
+    );
     expect(user).toBeNull();
   });
 
   it("validateCredentials: debe devolver null si el email no existe", async () => {
-    const user = await repository.validateCredentials("noexiste@example.com", "123456");
+    const user = await repository.validateCredentials(
+      "noexiste@example.com",
+      "123456",
+    );
     expect(user).toBeNull();
   });
 });
