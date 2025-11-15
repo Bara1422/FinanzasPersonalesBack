@@ -110,6 +110,7 @@ npm run dev
  ├── utils/               # CustomError, Excel y PDF exporters
  ├── app.ts               # Configuracion express
  └── index.ts             # Entrypoint del servidor
+/test                     # Tests
 ```
 
 ---

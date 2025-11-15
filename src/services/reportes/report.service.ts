@@ -15,7 +15,7 @@ export class ReportService {
     }
 
     const { data, title } = await dataStrategy.generar(id_usuario);
-    
+
     const formatStrategy = ReportFormatFactory.create(format);
     if (!formatStrategy) {
       throw new CustomError(`Formato de reporte inválido ${format}`, 400);

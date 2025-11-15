@@ -10,5 +10,4 @@ export interface INotificacionRepository<T extends Notificacion> {
   update(id: number, data: Partial<T>): Promise<T>;
   delete(id: number): Promise<string>;
   markAsPaid(id: number): Promise<T>;
-  
 }
