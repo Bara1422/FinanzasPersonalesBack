@@ -1,8 +1,6 @@
-import { describe, it, expect, beforeEach } from "vitest";
-import { TransaccionRepositoryMock } from "../../src/repositories/mock/TransaccionRepositoryMock";
-
+import { beforeEach, describe, expect, it } from "vitest";
 import { transaccionesMock } from "../../src/repositories/mock/data/transaccion.data";
-import { categoriasMock } from "../../src/repositories/mock/data/categoria.data";
+import { TransaccionRepositoryMock } from "../../src/repositories/mock/TransaccionRepositoryMock";
 
 describe("TransaccionRepositoryMock (Vitest)", () => {
   let repo: TransaccionRepositoryMock;
@@ -43,14 +41,14 @@ describe("TransaccionRepositoryMock (Vitest)", () => {
         monto: 1500,
         descripcion: "Nueva prueba",
       },
-      1
+      1,
     );
 
     expect(nueva.id_transaccion).toBeDefined();
     expect(nueva.monto).toBe(1500);
 
     const all = await repo.findAll();
-    expect(all.length).toBe(transaccionesMock.length );
+    expect(all.length).toBe(transaccionesMock.length);
   });
 
   it("update debe modificar una transacción existente", async () => {
@@ -63,9 +61,9 @@ describe("TransaccionRepositoryMock (Vitest)", () => {
   });
 
   it("update debe lanzar error si la transacción no existe", async () => {
-    await expect(() => repo.update(999, { monto: 100 }))
-      .rejects
-      .toThrow("Transacción no encontrada");
+    await expect(() => repo.update(999, { monto: 100 })).rejects.toThrow(
+      "Transacción no encontrada",
+    );
   });
 
   it("delete debe eliminar la transacción correctamente", async () => {
