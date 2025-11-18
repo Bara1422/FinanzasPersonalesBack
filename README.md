@@ -269,6 +269,53 @@ Y el service es donde se pasan los parametros para decidir que estrategia usar
 
 Elegimos Strategy porque nos permite haces que el report.service solo se encargue de llamar a export sin condicionales, dejando que el ReportFormatFactory y el ReportTypeFactory sean los que, en base al parametro que recibieron, elegir la estrategia.
 
+##### Facade
+```typescript
+class Seed {
+  private usuarios: Usuario[] = [];
+  private categorias: Categoria[] = [];
+  private transacciones: Transaccion[] = [];
+  private notificaciones: Notificacion[] = [];
+
+  constructor(private prisma: PrismaClient) {}
+
+  async clearDB(): Promise<void> {...}
+
+  async seedUser(): Promise<void> {...}
+
+  async seedCategories(): Promise<void> {...}
+
+  async seedTransactions(): Promise<void> {...}
+
+  async seedNotifications(): Promise<void> {...}
+
+  async seedAll(): Promise<void> {
+    await this.clearDB();
+    await this.seedUser();
+    await this.seedCategories();
+    await this.seedTransactions();
+    await this.seedNotifications();
+    console.log("Seed completado.");
+  }
+}
+
+async function main() {
+  const seeder = new Seed(prisma);
+  await seeder.seedAll();
+}
+
+main()
+  .then(async () => {
+    await prisma.$disconnect();
+  })
+  .catch(async (e) => {
+    console.error(e);
+    await prisma.$disconnect();
+    process.exit(1);
+  });
+```
+Decidimos usar facade para simplificar la inicialización de los datos iniciales de la BDD, usando un solo método de la clase Seed, que engloba a la creacion de usuarios, categorías, transacciones y notificaciones
+
 ---
 
 ##### Integrantes
