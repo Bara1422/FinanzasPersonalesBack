@@ -1,0 +1,130 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Rol {
+  ADMIN
+  USER
+}
+
+model Usuario {
+  id_usuario Int      @id @default(autoincrement())
+  name       String
+  password   String
+  email      String   @unique
+  username   String   @unique
+  rol        Rol      @default(USER)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  activo     Boolean  @default(true)
+
+  // Relaciones
+  transacciones Transaccion[]
+  listasUsuario ListasUsuarios[]
+  notificacions Notificacion[]
+}
+
+enum TipoCategoria {
+  INGRESO
+  GASTO
+}
+
+model Categoria {
+  id_categoria Int           @id @default(autoincrement())
+  nombre       String        @unique
+  tipo         TipoCategoria
+
+  // Relaciones
+  transacciones Transaccion[]
+  notificacions Notificacion[]
+}
+
+model Transaccion {
+  id_transaccion Int      @id @default(autoincrement())
+  id_usuario     Int
+  id_categoria   Int
+  monto          Float
+  descripcion    String
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
+
+  // Relaciones
+  usuario   Usuario   @relation(fields: [id_usuario], references: [id_usuario])
+  categoria Categoria @relation(fields: [id_categoria], references: [id_categoria])
+}
+
+enum EstadoNotificacion {
+  PENDIENTE
+  LEIDA
+}
+
+enum Prioridad {
+  BAJA
+  MEDIA
+  ALTA
+}
+
+model Notificacion {
+  id_notificacion   Int       @id @default(autoincrement())
+  id_usuario        Int
+  id_categoria      Int
+  descripcion       String
+  monto             Float
+  prioridad         Prioridad @default(MEDIA)
+  fecha_vencimiento DateTime
+  pagado            Boolean   @default(false)
+  created_at        DateTime  @default(now())
+  updated_at        DateTime  @updatedAt
+
+  // Relaciones
+  usuario   Usuario   @relation(fields: [id_usuario], references: [id_usuario])
+  categoria Categoria @relation(fields: [id_categoria], references: [id_categoria])
+}
+
+model ListaCompras {
+  id_lista     Int      @id @default(autoincrement())
+  nombre_lista String
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+  activo       Boolean  @default(true)
+
+  // Relaciones
+  items          ItemsCompras[]
+  listasUsuarios ListasUsuarios[]
+}
+
+enum EstadoItem {
+  PENDIENTE
+  COMPRADO
+}
+
+model ItemsCompras {
+  id_item         Int        @id @default(autoincrement())
+  id_lista        Int
+  nombre_producto String
+  cantidad        Int        @default(1)
+  precio_estimado Float
+  estado          EstadoItem @default(PENDIENTE)
+  created_at      DateTime   @default(now())
+  updated_at      DateTime   @updatedAt
+
+  // Relaciones
+  lista ListaCompras @relation(fields: [id_lista], references: [id_lista])
+}
+
+model ListasUsuarios {
+  id_lista_usuario Int      @id @default(autoincrement())
+  id_lista         Int
+  id_usuario       Int
+  es_creador       Boolean  @default(false)
+  added_at         DateTime @default(now())
+
+  // Relaciones
+  lista   ListaCompras @relation(fields: [id_lista], references: [id_lista])
+  usuario Usuario      @relation(fields: [id_usuario], references: [id_usuario])
+}

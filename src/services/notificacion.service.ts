@@ -1,0 +1,163 @@
+import type { Categoria, Notificacion } from "@prisma/client";
+import {
+  type NotificacionDTO,
+  toNotificacionDTO,
+} from "../dtos/notificacion.dto";
+import type { ICategoryRepository } from "../repositories/interfaces/ICategoryRepository";
+import type { INotificacionRepository } from "../repositories/interfaces/INotificacionRepository";
+import { CustomError } from "../utils/CustomError";
+
+export class NotificacionService {
+  constructor(
+    private notificacionRepository: INotificacionRepository<Notificacion>,
+    private categoriaRepository: ICategoryRepository<Categoria>,
+  ) {}
+
+  async crearNotificacion(data: Partial<NotificacionDTO>, id_usuario: number) {
+    const categoria = await this.categoriaRepository.getById(
+      data.id_categoria as number,
+    );
+    if (!categoria) {
+      throw new CustomError("La categoría especificada no existe", 400);
+    }
+
+    if (new Date(data.fecha_vencimiento) < new Date()) {
+      throw new CustomError(
+        "La fecha de vencimiento no puede ser en el pasado",
+        400,
+      );
+    }
+
+    const nuevaNotificacion = await this.notificacionRepository.create(
+      data,
+      id_usuario,
+    );
+    return toNotificacionDTO(nuevaNotificacion);
+  }
+
+  async obtenerTodasLasNotificaciones() {
+    const notificaciones = await this.notificacionRepository.findAll();
+    return notificaciones.map(toNotificacionDTO);
+  }
+
+  async obtenerNotificacionesUsuario(id_usuario: number) {
+    if (!id_usuario) {
+      throw new Error("ID de usuario no válido");
+    }
+    const notificacionesPorUsuario =
+      await this.notificacionRepository.findByUserId(id_usuario);
+
+    return notificacionesPorUsuario.map(toNotificacionDTO);
+  }
+
+  async obtenerNotificacionesPendientesUsuario(id_usuario: number) {
+    if (!id_usuario) {
+      throw new Error("ID de usuario no válido");
+    }
+    const notificacionesPendientes =
+      await this.notificacionRepository.findPendingByUserId(id_usuario);
+
+    return notificacionesPendientes.map(toNotificacionDTO);
+  }
+
+  async obtenerNotificacionesPagadasUsuario(id_usuario: number) {
+    if (!id_usuario) {
+      throw new Error("ID de usuario no válido");
+    }
+    const notificacionesPagadas =
+      await this.notificacionRepository.findPaidByUserId(id_usuario);
+
+    return notificacionesPagadas.map(toNotificacionDTO);
+  }
+
+  async obtenerNotificacionPorId(id_notificacion: number, id_usuario: number) {
+    if (!id_notificacion) {
+      throw new Error("ID de notificación no válido");
+    }
+
+    const notificacion =
+      await this.notificacionRepository.findById(id_notificacion);
+    if (!notificacion || notificacion.id_usuario !== id_usuario) {
+      throw new Error("Notificación no encontrada");
+    }
+    return toNotificacionDTO(notificacion);
+  }
+
+  async actualizarNotificacion(
+    id_notificacion: number,
+    data: Partial<NotificacionDTO>,
+    id_usuario: number,
+  ) {
+    const existente =
+      await this.notificacionRepository.findById(id_notificacion);
+    if (!existente) {
+      throw new CustomError("Notificación no encontrada", 404);
+    }
+
+    if (existente.id_usuario !== id_usuario) {
+      throw new CustomError(
+        "No tienes permiso para actualizar esta notificación",
+        403,
+      );
+    }
+
+    if (data.id_categoria) {
+      const categoria = await this.categoriaRepository.getById(
+        data.id_categoria,
+      );
+      if (!categoria) {
+        throw new CustomError("La categoría especificada no existe", 400);
+      }
+    }
+
+    const notificacionActualizada = await this.notificacionRepository.update(
+      id_notificacion,
+      data,
+    );
+
+    return toNotificacionDTO(notificacionActualizada);
+  }
+
+  async eliminarNotificacion(id_notificacion: number, id_usuario: number) {
+    const existente =
+      await this.notificacionRepository.findById(id_notificacion);
+    if (!existente) {
+      throw new CustomError("Notificación no encontrada", 404);
+    }
+
+    if (existente.id_usuario !== id_usuario) {
+      throw new CustomError(
+        "No tienes permiso para eliminar esta notificación",
+        403,
+      );
+    }
+
+    return this.notificacionRepository.delete(id_notificacion);
+  }
+
+  async marcarNotificacionComoPagada(
+    id_notificacion: number,
+    id_usuario: number,
+  ) {
+    const existente =
+      await this.notificacionRepository.findById(id_notificacion);
+
+    if (!existente) {
+      throw new CustomError("Notificación no encontrada", 404);
+    }
+    if (existente.id_usuario !== id_usuario) {
+      throw new CustomError(
+        "No tienes permiso para actualizar esta notificación",
+        403,
+      );
+    }
+
+    if (existente.pagado) {
+      throw new CustomError("La notificación ya está marcada como pagada", 400);
+    }
+
+    const notificacionPagada =
+      await this.notificacionRepository.markAsPaid(id_notificacion);
+    return toNotificacionDTO(notificacionPagada);
+  }
+}
