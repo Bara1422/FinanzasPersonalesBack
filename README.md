@@ -318,6 +318,15 @@ Decidimos usar facade para simplificar la inicialización de los datos iniciales
 
 ---
 
+#### Links repositorios deployados
+
+- Backend: https://finanzaspersonalesback.onrender.com/
+- Frontend: https://finanzas-personales-front.vercel.app/
+
+Si se prueba por este medio, abrir link de backend y esperar a que render inicie el proyecto que se encuentra en suspension.
+
+---
+
 ##### Integrantes
 
 - Ismael Cordoba
