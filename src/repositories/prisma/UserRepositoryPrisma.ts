@@ -63,6 +63,41 @@ export class UserRepositoryPrisma implements IUserRepository<Usuario> {
     return "Usuario eliminado correctamente";
   }
 
+  async findByResetToken(token: string): Promise<Usuario | null> {
+    return await prisma.usuario.findFirst({
+      where: { reset_token: token },
+    });
+  }
+
+  async setResetToken(
+    id: number,
+    token: string | null,
+    expiresAt: Date | null,
+  ): Promise<Usuario> {
+    return await prisma.usuario.update({
+      where: { id_usuario: id },
+      data: {
+        reset_token: token,
+        reset_token_expires_at: expiresAt,
+        updated_at: new Date(),
+      },
+    });
+  }
+
+  async updatePassword(id: number, password: string): Promise<Usuario> {
+    const password_hash = this.hasher.hash(password);
+
+    return await prisma.usuario.update({
+      where: { id_usuario: id },
+      data: {
+        password: password_hash,
+        reset_token: null,
+        reset_token_expires_at: null,
+        updated_at: new Date(),
+      },
+    });
+  }
+
   async validateCredentials(
     email: string,
     password: string,

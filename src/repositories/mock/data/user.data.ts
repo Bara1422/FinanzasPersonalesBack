@@ -14,6 +14,8 @@ export const userMock: Usuario[] = [
     created_at: new Date(),
     updated_at: new Date(),
     activo: true,
+    reset_token: null,
+    reset_token_expires_at: null,
   },
   {
     id_usuario: 2,
@@ -25,5 +27,7 @@ export const userMock: Usuario[] = [
     created_at: new Date(),
     updated_at: new Date(),
     activo: true,
+    reset_token: null,
+    reset_token_expires_at: null,
   },
 ];
