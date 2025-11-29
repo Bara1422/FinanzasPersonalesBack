@@ -22,6 +22,8 @@ model Usuario {
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
   activo     Boolean  @default(true)
+  reset_token String?
+  reset_token_expires_at DateTime?
 
   // Relaciones
   transacciones Transaccion[]

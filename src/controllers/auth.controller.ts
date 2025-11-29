@@ -37,6 +37,26 @@ export class AuthController {
     }
   };
 
+  forgotPassword = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { email } = req.body;
+      const result = await this.authService.sendResetToken(email);
+      return res.status(200).json(result);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  resetPassword = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { token, password } = req.body;
+      const result = await this.authService.resetPassword(token, password);
+      return res.status(200).json(result);
+    } catch (error) {
+      next(error);
+    }
+  };
+
   me = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
       const userId = req.user.id_usuario;
