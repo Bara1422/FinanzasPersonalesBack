@@ -45,6 +45,8 @@ export class UserRepositoryPrisma implements IUserRepository<Usuario> {
         activo: data.activo ?? true,
         created_at: data.created_at ?? new Date(),
         updated_at: data.updated_at ?? new Date(),
+        reset_token: data.reset_token ?? null,
+        reset_token_expires_at: data.reset_token_expires_at ?? null,
       },
     });
   }

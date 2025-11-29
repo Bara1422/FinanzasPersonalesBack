@@ -43,6 +43,8 @@ class Seed {
             username: user.username,
             rol: user.rol,
             activo: user.activo,
+            reset_token: user.reset_token,
+            reset_token_expires_at: user.reset_token_expires_at,
           },
         }),
       ),
