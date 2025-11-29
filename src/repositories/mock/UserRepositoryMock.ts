@@ -19,6 +19,11 @@ export class UserRepositoryMock implements IUserRepository<Usuario> {
     return Promise.resolve(usuario || null);
   }
 
+  async findByResetToken(token: string): Promise<Usuario | null> {
+    const usuario = this.usuariosDB.find((user) => user.reset_token === token);
+    return Promise.resolve(usuario || null);
+  }
+
   async findAll(): Promise<Usuario[]> {
     return Promise.resolve(this.usuariosDB);
   }
@@ -55,10 +60,39 @@ export class UserRepositoryMock implements IUserRepository<Usuario> {
       created_at: data.created_at || new Date(),
       updated_at: data.updated_at || new Date(),
       activo: true,
+      reset_token: null,
+      reset_token_expires_at: null,
     };
 
     this.usuariosDB.push(newUsuario);
     return Promise.resolve(newUsuario);
+  }
+
+  async setResetToken(
+    id: number,
+    token: string | null,
+    expiresAt: Date | null,
+  ): Promise<Usuario | null> {
+    const usuario = await this.findById(id);
+    if (!usuario) return Promise.resolve(null);
+
+    return this.update(id, {
+      reset_token: token,
+      reset_token_expires_at: expiresAt,
+    });
+  }
+
+  async updatePassword(id: number, password: string): Promise<Usuario | null> {
+    const usuario = await this.findById(id);
+    if (!usuario) return Promise.resolve(null);
+
+    const password_hash = this.hasher.hash(password);
+
+    return this.update(id, {
+      password: password_hash,
+      reset_token: null,
+      reset_token_expires_at: null,
+    });
   }
 
   async validateCredentials(
