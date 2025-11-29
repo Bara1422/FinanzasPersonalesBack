@@ -57,6 +57,12 @@ npm install
    PORT=3000
    DATABASE_URL=
    CORS_ORIGIN=
+   FRONTEND_URL=
+   SMTP_HOST=
+   SMTP_PORT=
+   SMTP_USER=
+   SMTP_PASS=
+   SMTP_FROM=
    ```
 
 4. Generar codigo cliente de Prisma para tipado estricto en TypeScript
