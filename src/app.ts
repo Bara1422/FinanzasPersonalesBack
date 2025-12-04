@@ -3,6 +3,7 @@ import express from "express";
 import { ENV } from "./config/env";
 import { authMiddleware } from "./middlewares/auth.middleware";
 import { errorHandler } from "./middlewares/custom-error.middleware";
+import { apiLimiter } from "./middlewares/rate-limit.middleware";
 import authRoutes from "./routes/auth.routes";
 import categoryRoutes from "./routes/category.routes";
 import notificacionRoutes from "./routes/notificacion.router";
@@ -20,6 +21,8 @@ const corsOptions = {
 
 app.use(express.json());
 app.use(cors(corsOptions));
+
+app.use(apiLimiter);
 
 /* sin auth */
 app.use("/auth", authRoutes);

@@ -1,8 +1,12 @@
 import { Router } from "express";
 import { AuthController } from "../controllers/auth.controller";
 import { authMiddleware } from "../middlewares/auth.middleware";
+import { authLimiter } from "../middlewares/rate-limit.middleware";
 import { validate } from "../middlewares/validate-schema.middleware";
-import { forgotPasswordSchema, resetPasswordSchema } from "../schemas/auth.schema";
+import {
+  forgotPasswordSchema,
+  resetPasswordSchema,
+} from "../schemas/auth.schema";
 import { createUsuarioSchema } from "../schemas/usuario.schema";
 import { authService, userService } from "../services";
 
@@ -12,10 +16,11 @@ const authController = new AuthController(authService, userService);
 // Rutas de autenticación
 router.post(
   "/register",
+  authLimiter,
   validate(createUsuarioSchema),
   authController.register,
 );
-router.post("/login", authController.login);
+router.post("/login", authLimiter, authController.login);
 router.post(
   "/forgot-password",
   validate(forgotPasswordSchema),
@@ -23,6 +28,7 @@ router.post(
 );
 router.post(
   "/reset-password",
+  authLimiter,
   validate(resetPasswordSchema),
   authController.resetPassword,
 );
