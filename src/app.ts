@@ -8,8 +8,8 @@ import authRoutes from "./routes/auth.routes";
 import categoryRoutes from "./routes/category.routes";
 import notificacionRoutes from "./routes/notificacion.routes";
 import reportRoutes from "./routes/report.routes";
-import transaccionRoutes from "./routes/transaccion.router";
-import userRoutes from "./routes/usuario.router";
+import transaccionRoutes from "./routes/transaccion.routes";
+import userRoutes from "./routes/usuario.routes";
 
 const app = express();
 
