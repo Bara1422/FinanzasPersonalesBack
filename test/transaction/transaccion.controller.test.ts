@@ -1,7 +1,7 @@
 import type { NextFunction, Response } from "express";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { TransaccionController } from "../../src/controllers/transaccion.controller"; // ajustá
-import type { AuthRequest } from "../../src/middlewares/auth.middleware"; // ajustá
+import { TransaccionController } from "../../src/controllers/transaccion.controller";
+import type { AuthRequest } from "../../src/middlewares/auth.middleware"; 
 
 describe("TransaccionController", () => {
   let service: any;

@@ -1,7 +1,7 @@
 import type { Categoria, Transaccion } from "@prisma/client";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { TransaccionService } from "../../src/services/transaccion.service"; // ajustá
-import { CustomError } from "../../src/utils/CustomError"; // ajustá
+import { TransaccionService } from "../../src/services/transaccion.service";
+import { CustomError } from "../../src/utils/CustomError"; 
 
 // ✅ mock del dto para comparar fácil
 vi.mock("../../src/dtos/transaccion.dto", () => ({
