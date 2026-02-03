@@ -190,7 +190,7 @@ describe("AuthService", () => {
   it("resetPassword: token expirado => 400", async () => {
     userRepository.findByResetToken.mockResolvedValue({
       ...baseUser,
-      reset_token_expires_at: new Date(Date.now() - 1000), // pasado
+      reset_token_expires_at: new Date(Date.now() - 1000),
     });
 
     await expect(service.resetPassword("rawToken", "newPass")).rejects.toThrow(
