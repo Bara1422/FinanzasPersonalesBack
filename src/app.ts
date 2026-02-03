@@ -6,7 +6,7 @@ import { errorHandler } from "./middlewares/custom-error.middleware";
 import { apiLimiter } from "./middlewares/rate-limit.middleware";
 import authRoutes from "./routes/auth.routes";
 import categoryRoutes from "./routes/category.routes";
-import notificacionRoutes from "./routes/notificacion.router";
+import notificacionRoutes from "./routes/notificacion.routes";
 import reportRoutes from "./routes/report.routes";
 import transaccionRoutes from "./routes/transaccion.router";
 import userRoutes from "./routes/usuario.router";
