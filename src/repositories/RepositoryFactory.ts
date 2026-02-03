@@ -1,9 +1,25 @@
 import { BcryptAdapter } from "../config/bcrypt";
 
+import {
+  CategoryRepositoryMock,
+  NotificacionRepositoryMock,
+  TransaccionRepositoryMock,
+  UserRepositoryMock,
+} from "./mock";
+
+import {
+  CategoryRepositoryPrisma,
+  NotificacionRepositoryPrisma,
+  TransaccionRepositoryPrisma,
+  UserRepositoryPrisma,
+} from "./prisma";
+
 export class RepositoryFactory {
   private static hasher = BcryptAdapter.getInstance();
+
   static createAllRepositories() {
-    const useMock = process.env.NODE_ENV === "development";
+    const useMock =
+      process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test";
 
     if (useMock) {
       return RepositoryFactory.createMockRepositories();
@@ -13,13 +29,6 @@ export class RepositoryFactory {
   }
 
   private static createMockRepositories() {
-    const {
-      UserRepositoryMock,
-      TransaccionRepositoryMock,
-      NotificacionRepositoryMock,
-      CategoryRepositoryMock,
-    } = require("./mock");
-
     return {
       userRepository: new UserRepositoryMock(RepositoryFactory.hasher),
       transactionRepository: new TransaccionRepositoryMock(),
@@ -29,13 +38,6 @@ export class RepositoryFactory {
   }
 
   private static createPrismaRepositories() {
-    const {
-      UserRepositoryPrisma,
-      TransaccionRepositoryPrisma,
-      NotificacionRepositoryPrisma,
-      CategoryRepositoryPrisma,
-    } = require("./prisma");
-
     return {
       userRepository: new UserRepositoryPrisma(RepositoryFactory.hasher),
       transactionRepository: new TransaccionRepositoryPrisma(),
