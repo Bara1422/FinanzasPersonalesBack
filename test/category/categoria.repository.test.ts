@@ -1,7 +1,7 @@
 import { $Enums } from "@prisma/client";
 import { beforeEach, describe, expect, it } from "vitest";
-import { CategoryRepositoryMock } from "./../../src/repositories/mock/CategoryRepositoryMock";
-import { categoriasMock } from "./../../src/repositories/mock/data/categoria.data";
+import { CategoryRepositoryMock } from "../../src/repositories/mock/CategoryRepositoryMock";
+import { categoriasMock } from "../../src/repositories/mock/data/categoria.data";
 
 describe("CategoryRepositoryMock", () => {
   let repo: CategoryRepositoryMock;
